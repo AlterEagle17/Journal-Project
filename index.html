@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit Journal - Trading Journal App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00d4ff;
+            --primary-dark: #0099cc;
+            --success-color: #00ff88;
+            --danger-color: #ff3333;
+            --warning-color: #ffaa00;
+            --bg-dark: #0a0e27;
+            --bg-card: #1a1f3a;
+            --bg-input: #0f1229;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --border-color: #2d3748;
+            --shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0d1538 100%);
+            color: var(--text-primary);
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ============================================================================
+           LOGIN PAGE
+           ============================================================================ */
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0d1538 100%);
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .login-box h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-box p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .login-error {
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 51, 51, 0.1);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        /* ============================================================================
+           SIDEBAR
+           ============================================================================ */
+
+        .sidebar {
+            width: 250px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2));
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .sidebar-footer {
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .user-info {
+            padding: 12px;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+
+        .user-info p {
+            color: var(--text-secondary);
+            margin: 4px 0;
+        }
+
+        /* ============================================================================
+           MAIN CONTENT
+           ============================================================================ */
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-header h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        /* ============================================================================
+           DASHBOARD PAGE
+           ============================================================================ */
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-create-journal {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .btn-create-journal:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .journals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .journal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .journal-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .journal-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .journal-card p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 8px 0;
+        }
+
+        .journal-card .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .journal-card .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #00ff88);
+            transition: width 0.3s ease;
+        }
+
+        .journal-card .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: space-between;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-small:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+
+        .btn-delete {
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state h2 {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* ============================================================================
+           JOURNAL PAGE
+           ============================================================================ */
+
+        .journal-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .journal-title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value.profit {
+            color: var(--success-color);
+        }
+
+        .stat-value.loss {
+            color: var(--danger-color);
+        }
+
+        .stat-value.neutral {
+            color: var(--text-primary);
+        }
+
+        .progress-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar-large {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill-large {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #00ff88);
+            transition: width 0.3s ease;
+        }
+
+        /* ============================================================================
+           CALENDAR
+           ============================================================================ */
+
+        .calendar-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-header h2 {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-nav {
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+
+        .calendar-month {
+            font-size: 12px;
+            color: var(--text-secondary);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-size: 9px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 4px;
+            text-transform: uppercase;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 8px;
+            padding: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .calendar-day:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.2;
+        }
+
+        .calendar-day.profit {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .calendar-day.loss {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .calendar-day.neutral {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .calendar-day.selected {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+        }
+
+        .calendar-day-date {
+            font-weight: 700;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+
+        .calendar-day-amount {
+            font-size: 7px;
+            font-weight: 600;
+            margin-bottom: 1px;
+        }
+
+        .calendar-day-percentage {
+            font-size: 7px;
+            opacity: 0.8;
+        }
+
+        /* ============================================================================
+           TRANSACTION HISTORY
+           ============================================================================ */
+
+        .transaction-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .transaction-container h2 {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .transaction-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .transaction-time {
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+        }
+
+        .transaction-right {
+            text-align: right;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .transaction-amount.profit {
+            color: var(--success-color);
+        }
+
+        .transaction-amount.loss {
+            color: var(--danger-color);
+        }
+
+        /* ============================================================================
+           QUICK ACTION
+           ============================================================================ */
+
+        .quick-action-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .quick-action-container h2 {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .quick-action-buttons {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: transparent;
+        }
+
+        .btn-action.profit {
+            color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-action.profit:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .btn-action.profit.selected {
+            background: var(--success-color);
+            color: #000;
+        }
+
+        .btn-action.loss {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .btn-action.loss:hover {
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        .btn-action.loss.selected {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .quick-action-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .input-group label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-right: 8px;
+            min-width: 40px;
+        }
+
+        .input-group input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-add {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* ============================================================================
+           ADDITIONAL INSIGHTS
+           ============================================================================ */
+
+        .insights-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .insights-container h2 {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .insight-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .insight-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .insight-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .insight-date {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* ============================================================================
+           MODALS
+           ============================================================================ */
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .btn-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-form .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-form label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-form input,
+        .modal-form select {
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-form input:focus,
+        .modal-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .modal-form select {
+            cursor: pointer;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, var(--primary-color), #00ff88);
+            color: #000;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-modal-secondary {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-modal-secondary:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+
+        /* ============================================================================
+           RESPONSIVE DESIGN
+           ============================================================================ */
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+                padding: 15px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                flex-direction: row;
+                padding: 15px;
+            }
+
+            .sidebar-header {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+                padding-right: 20px;
+                border-right: 1px solid var(--border-color);
+                min-width: 200px;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                flex: 1;
+                overflow-x: auto;
+                gap: 5px;
+                margin: 0 20px;
+            }
+
+            .sidebar-footer {
+                border-top: none;
+                border-left: 1px solid var(--border-color);
+                padding-left: 20px;
+                padding-top: 0;
+            }
+
+            .main-content {
+                height: calc(100vh - 80px);
+            }
+
+            .content-header {
+                flex-wrap: wrap;
+            }
+
+            .journals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-action-buttons {
+                flex-direction: column;
+            }
+
+            .quick-action-input {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 20px;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+
+            .journal-header {
+                padding: 15px;
+            }
+
+            .calendar-container {
+                padding: 15px;
+            }
+
+            .transaction-container {
+                padding: 15px;
+            }
+
+            .quick-action-container {
+                padding: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .btn-login {
+                font-size: 12px;
+            }
+        }
+
+        /* ============================================================================
+           SCROLLBAR STYLING
+           ============================================================================ */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-input);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff88;
+        }
+
+        /* ============================================================================
+           ANIMATIONS
+           ============================================================================ */
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page.active {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- LOGIN PAGE -->
+        <div id="loginPage" class="login-container">
+            <div class="login-box">
+                <h1>PROFIT JOURNAL</h1>
+                <p>Trading Performance Tracker</p>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-login">Login</button>
+                    <div class="login-error" id="loginError"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- APP INTERFACE -->
+        <div id="appContainer" style="display: none; width: 100%; height: 100%;">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h2>PROFIT JOURNAL</h2>
+                </div>
+                <div class="user-info">
+                    <p>Logged in as:</p>
+                    <p id="currentUsername" style="font-weight: 600; color: var(--primary-color);">User</p>
+                </div>
+                <div class="sidebar-nav">
+                    <div class="nav-item active" data-page="dashboard">📊 Dashboard</div>
+                    <div class="nav-item" data-page="journal">📓 Journal</div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="btn-logout" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="content-header">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <div id="headerActions"></div>
+                </div>
+                <div class="content-area">
+                    <!-- DASHBOARD PAGE -->
+                    <div id="dashboardPage" class="page active">
+                        <div class="dashboard-header">
+                            <div></div>
+                            <button class="btn-create-journal" id="createJournalBtn">+ Create Journal</button>
+                        </div>
+                        <div id="journalsContainer" class="journals-grid"></div>
+                    </div>
+
+                    <!-- JOURNAL PAGE -->
+                    <div id="journalPage" class="page">
+                        <!-- Journal Header with Stats -->
+                        <div class="journal-header">
+                            <div class="journal-title" id="journalTitle">Loading...</div>
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-label">Target Amount</div>
+                                    <div class="stat-value" id="statTarget">₹0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Total Profit/Loss</div>
+                                    <div class="stat-value" id="statNetPL">₹0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Days Completed</div>
+                                    <div class="stat-value" id="statDaysCompleted">0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Days Remaining</div>
+                                    <div class="stat-value" id="statDaysRemaining">0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Amount Still Needed</div>
+                                    <div class="stat-value" id="statAmountNeeded">₹0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Overall Progress</div>
+                                    <div class="stat-value" id="statProgress">0%</div>
+                                </div>
+                            </div>
+                            <div class="progress-section">
+                                <div class="progress-label">
+                                    <span>Progress to Target</span>
+                                    <span id="progressText">0% Complete</span>
+                                </div>
+                                <div class="progress-bar-large">
+                                    <div class="progress-fill-large" id="progressFill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CALENDAR -->
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <h2>Calendar</h2>
+                                <div class="calendar-nav">
+                                    <button class="btn-nav" id="prevMonth">←</button>
+                                    <div class="calendar-month" id="calendarMonth">Loading...</div>
+                                    <button class="btn-nav" id="nextMonth">→</button>
+                                </div>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Sun</div>
+                                <div class="weekday">Mon</div>
+                                <div class="weekday">Tue</div>
+                                <div class="weekday">Wed</div>
+                                <div class="weekday">Thu</div>
+                                <div class="weekday">Fri</div>
+                                <div class="weekday">Sat</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDays"></div>
+                        </div>
+
+                        <!-- TRANSACTION HISTORY FOR SELECTED DATE -->
+                        <div class="transaction-container" id="dateTransactionContainer" style="display: none;">
+                            <h2 id="dateTransactionTitle">Transactions for Date</h2>
+                            <div id="dateTransactionStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                                <div class="stat-box">
+                                    <div class="stat-label">Total Profit</div>
+                                    <div class="stat-value profit" id="dateTotalProfit">₹0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Total Loss</div>
+                                    <div class="stat-value loss" id="dateTotalLoss">₹0</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Net P/L</div>
+                                    <div class="stat-value neutral" id="dateNetPL">₹0</div>
+                                </div>
+                            </div>
+                            <div class="transaction-list" id="dateTransactionList"></div>
+                        </div>
+
+                        <!-- QUICK ACTION -->
+                        <div class="quick-action-container">
+                            <h2>Quick Action</h2>
+                            <div class="quick-action-buttons">
+                                <button class="btn-action profit" id="btnProfit">[ PROFIT ]</button>
+                                <button class="btn-action loss" id="btnLoss">[ LOSS ]</button>
+                            </div>
+                            <div class="quick-action-input">
+                                <div class="input-group">
+                                    <label>Amount</label>
+                                    <input type="number" id="quickAmount" placeholder="₹" step="0.01" min="0">
+                                </div>
+                                <button class="btn-add" id="btnAddTransaction">ADD</button>
+                            </div>
+                        </div>
+
+                        <!-- ADDITIONAL INSIGHTS -->
+                        <div class="insights-container">
+                            <h2>Additional Insights</h2>
+                            <div class="insights-grid">
+                                <div class="insight-item">
+                                    <div class="insight-label">Average Profit Per Day</div>
+                                    <div class="insight-value" id="insightAvgProfit">₹0</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-label">Required Per Day</div>
+                                    <div class="insight-value" id="insightRequiredPerDay">₹0</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-label">Best Day</div>
+                                    <div class="insight-value" id="insightBestDay">₹0</div>
+                                    <div class="insight-date" id="insightBestDayDate">-</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-label">Worst Day</div>
+                                    <div class="insight-value" id="insightWorstDay">₹0</div>
+                                    <div class="insight-date" id="insightWorstDayDate">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RECENT TRANSACTIONS -->
+                        <div class="transaction-container">
+                            <h2>Recent History</h2>
+                            <div class="transaction-list" id="recentTransactionList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE JOURNAL MODAL -->
+    <div class="modal" id="createJournalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Create New Journal</span>
+                <button class="btn-close" id="closeCreateModal">&times;</button>
+            </div>
+            <form class="modal-form" id="createJournalForm">
+                <div class="form-group">
+                    <label for="journalName">Journal Name</label>
+                    <input type="text" id="journalName" name="journalName" placeholder="e.g., January Trading" required>
+                </div>
+                <div class="form-group">
+                    <label for="targetAmount">Target Amount (₹)</label>
+                    <input type="number" id="targetAmount" name="targetAmount" placeholder="0" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-modal-secondary" id="cancelCreateModal">Cancel</button>
+                    <button type="submit" class="btn-modal btn-modal-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // APPLICATION STATE
+        // ============================================================================
+
+        const APP_STATE = {
+            currentUser: null,
+            currentJournal: null,
+            allTransactions: [],
+            selectedDate: null,
+            selectedTransactionType: null,
+            currentMonth: new Date(),
+            appScriptUrl: 'https://script.google.com/macros/s/AKfycbxfloFk7pDYDmEV4Ocigp-6pYlC9MMGe9qUvqZwQo2ISmplUuc57EjJcZdz9gcWejm9Pg/exec'
+        };
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            setDefaultDates();
+        });
+
+        function setupEventListeners() {
+            // Login
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    navigateToPage(this.dataset.page);
+                });
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // Create Journal
+            document.getElementById('createJournalBtn').addEventListener('click', openCreateJournalModal);
+            document.getElementById('closeCreateModal').addEventListener('click', closeCreateJournalModal);
+            document.getElementById('cancelCreateModal').addEventListener('click', closeCreateJournalModal);
+            document.getElementById('createJournalForm').addEventListener('submit', handleCreateJournal);
+
+            // Calendar Navigation
+            document.getElementById('prevMonth').addEventListener('click', previousMonth);
+            document.getElementById('nextMonth').addEventListener('click', nextMonth);
+
+            // Quick Actions
+            document.getElementById('btnProfit').addEventListener('click', function() {
+                selectTransactionType('PROFIT');
+            });
+            document.getElementById('btnLoss').addEventListener('click', function() {
+                selectTransactionType('LOSS');
+            });
+            document.getElementById('btnAddTransaction').addEventListener('click', handleAddTransaction);
+
+            // Modal close on background click
+            document.getElementById('createJournalModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCreateJournalModal();
+                }
+            });
+        }
+
+        function setDefaultDates() {
+            const today = new Date();
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            
+            document.getElementById('startDate').valueAsDate = today;
+            document.getElementById('endDate').valueAsDate = nextMonth;
+        }
+
+        // ============================================================================
+        // AUTHENTICATION
+        // ============================================================================
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+
+            errorEl.classList.remove('show');
+
+            if (!username || !password) {
+                showLoginError('Please enter username and password');
+                return;
+            }
+
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success' && data.data.authenticated) {
+                    APP_STATE.currentUser = username;
+                    document.getElementById('currentUsername').textContent = username;
+                    showApp();
+                    loadJournals();
+                } else {
+                    showLoginError(data.data?.message || 'Login failed');
+                }
+            } catch (error) {
+                showLoginError('Error: ' + error.message);
+            }
+        }
+
+        function showLoginError(message) {
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function handleLogout() {
+            APP_STATE.currentUser = null;
+            APP_STATE.currentJournal = null;
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            navigateToPage('dashboard');
+        }
+
+        // ============================================================================
+        // NAVIGATION
+        // ============================================================================
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'flex';
+        }
+
+        function navigateToPage(page) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+
+            // Show selected page
+            if (page === 'dashboard') {
+                document.getElementById('dashboardPage').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Dashboard';
+                loadJournals();
+            } else if (page === 'journal') {
+                if (!APP_STATE.currentJournal) {
+                    alert('Please select a journal first');
+                    navigateToPage('dashboard');
+                    return;
+                }
+                document.getElementById('journalPage').classList.add('active');
+                document.getElementById('pageTitle').textContent = APP_STATE.currentJournal.journalName;
+                loadJournalDetails();
+            }
+        }
+
+        // ============================================================================
+        // JOURNALS
+        // ============================================================================
+
+        async function loadJournals() {
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getJournals',
+                        username: APP_STATE.currentUser
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayJournals(data.data.journals);
+                }
+            } catch (error) {
+                console.error('Error loading journals:', error);
+            }
+        }
+
+        function displayJournals(journals) {
+            const container = document.getElementById('journalsContainer');
+            
+            if (journals.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state">
+                            <h2>No Journals Yet</h2>
+                            <p>Create a new journal to start tracking your trading performance</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = journals.map(journal => `
+                <div class="journal-card">
+                    <h3>${journal.journalName}</h3>
+                    <p>Target: ₹${parseFloat(journal.targetAmount).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <p>Period: ${formatDate(journal.startDate)} to ${formatDate(journal.endDate)}</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-small" onclick="openJournal('${journal.journalId}')">Open</button>
+                        <button class="btn-small btn-delete" onclick="deleteJournal('${journal.journalId}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openJournal(journalId) {
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getJournalDetails',
+                        journalId: journalId,
+                        username: APP_STATE.currentUser
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    APP_STATE.currentJournal = data.data.journal;
+                    APP_STATE.allTransactions = data.data.transactions;
+                    APP_STATE.currentMonth = new Date(data.data.journal.startDate);
+                    APP_STATE.selectedDate = null;
+                    navigateToPage('journal');
+                }
+            } catch (error) {
+                console.error('Error opening journal:', error);
+            }
+        }
+
+        async function deleteJournal(journalId) {
+            if (!confirm('Are you sure you want to delete this journal?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'deleteJournal',
+                        journalId: journalId,
+                        username: APP_STATE.currentUser
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    loadJournals();
+                }
+            } catch (error) {
+                console.error('Error deleting journal:', error);
+            }
+        }
+
+        // ============================================================================
+        // CREATE JOURNAL
+        // ============================================================================
+
+        function openCreateJournalModal() {
+            document.getElementById('createJournalModal').classList.add('active');
+        }
+
+        function closeCreateJournalModal() {
+            document.getElementById('createJournalModal').classList.remove('active');
+            document.getElementById('createJournalForm').reset();
+            setDefaultDates();
+        }
+
+        async function handleCreateJournal(e) {
+            e.preventDefault();
+
+            const journalName = document.getElementById('journalName').value.trim();
+            const targetAmount = parseFloat(document.getElementById('targetAmount').value);
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!journalName || !targetAmount || !startDate || !endDate) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            if (new Date(startDate) >= new Date(endDate)) {
+                alert('End date must be after start date');
+                return;
+            }
+
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'createJournal',
+                        username: APP_STATE.currentUser,
+                        journalName: journalName,
+                        targetAmount: targetAmount,
+                        startDate: startDate,
+                        endDate: endDate
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    closeCreateJournalModal();
+                    loadJournals();
+                }
+            } catch (error) {
+                console.error('Error creating journal:', error);
+                alert('Error creating journal');
+            }
+        }
+
+        // ============================================================================
+        // JOURNAL DETAILS & DISPLAY
+        // ============================================================================
+
+        async function loadJournalDetails() {
+            if (!APP_STATE.currentJournal) return;
+
+            updateJournalHeader();
+            renderCalendar();
+            updateRecentTransactions();
+        }
+
+        function updateJournalHeader() {
+            const journal = APP_STATE.currentJournal;
+            const stats = calculateStats();
+
+            document.getElementById('journalTitle').textContent = journal.journalName;
+            document.getElementById('statTarget').textContent = `₹${parseFloat(journal.targetAmount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('statNetPL').textContent = `₹${stats.netPL.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('statDaysCompleted').textContent = stats.daysCompleted;
+            document.getElementById('statDaysRemaining').textContent = stats.daysRemaining;
+            document.getElementById('statAmountNeeded').textContent = `₹${stats.amountStillNeeded.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('statProgress').textContent = `${stats.progressPercentage.toFixed(1)}%`;
+
+            const progressPercentage = Math.min(100, stats.progressPercentage);
+            document.getElementById('progressFill').style.width = progressPercentage + '%';
+            document.getElementById('progressText').textContent = `${progressPercentage.toFixed(1)}% Complete`;
+
+            // Update insights
+            document.getElementById('insightAvgProfit').textContent = `₹${stats.avgProfitPerDay.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('insightRequiredPerDay').textContent = `₹${stats.requiredPerDay.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('insightBestDay').textContent = `₹${stats.bestDayAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('insightBestDayDate').textContent = stats.bestDay ? formatDate(stats.bestDay) : '-';
+            document.getElementById('insightWorstDay').textContent = `₹${stats.worstDayAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('insightWorstDayDate').textContent = stats.worstDay ? formatDate(stats.worstDay) : '-';
+        }
+
+        function calculateStats() {
+            const journal = APP_STATE.currentJournal;
+            const transactions = APP_STATE.allTransactions;
+            const startDate = new Date(journal.startDate);
+            const endDate = new Date(journal.endDate);
+            const today = new Date();
+
+            let totalProfit = 0;
+            let totalLoss = 0;
+            let dailyNetProfit = {};
+
+            transactions.forEach(txn => {
+                const amount = parseFloat(txn.amount);
+                if (!dailyNetProfit[txn.transactionDate]) {
+                    dailyNetProfit[txn.transactionDate] = 0;
+                }
+
+                if (txn.type === 'PROFIT') {
+                    totalProfit += amount;
+                    dailyNetProfit[txn.transactionDate] += amount;
+                } else if (txn.type === 'LOSS') {
+                    totalLoss += amount;
+                    dailyNetProfit[txn.transactionDate] -= amount;
+                }
+            });
+
+            const netPL = totalProfit - totalLoss;
+            const daysCompleted = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+            const amountStillNeeded = Math.max(0, journal.targetAmount - netPL);
+            const progressPercentage = (netPL / journal.targetAmount) * 100;
+
+            let bestDay = null;
+            let bestDayAmount = -Infinity;
+            let worstDay = null;
+            let worstDayAmount = Infinity;
+
+            for (let date in dailyNetProfit) {
+                if (dailyNetProfit[date] > bestDayAmount) {
+                    bestDayAmount = dailyNetProfit[date];
+                    bestDay = date;
+                }
+                if (dailyNetProfit[date] < worstDayAmount) {
+                    worstDayAmount = dailyNetProfit[date];
+                    worstDay = date;
+                }
+            }
+
+            const transactionCount = Object.keys(dailyNetProfit).length;
+            const avgProfitPerDay = transactionCount > 0 ? netPL / transactionCount : 0;
+            const requiredPerDay = daysRemaining > 0 ? amountStillNeeded / daysRemaining : 0;
+
+            return {
+                totalProfit,
+                totalLoss,
+                netPL,
+                daysCompleted: Math.max(0, daysCompleted),
+                daysRemaining: Math.max(0, daysRemaining),
+                totalDays,
+                amountStillNeeded,
+                progressPercentage: Math.min(100, Math.max(0, progressPercentage)),
+                dailyNetProfit,
+                bestDay,
+                bestDayAmount,
+                worstDay,
+                worstDayAmount,
+                avgProfitPerDay,
+                requiredPerDay
+            };
+        }
+
+        // ============================================================================
+        // CALENDAR
+        // ============================================================================
+
+        function renderCalendar() {
+            const year = APP_STATE.currentMonth.getFullYear();
+            const month = APP_STATE.currentMonth.getMonth();
+
+            document.getElementById('calendarMonth').textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            const stats = calculateStats();
+            const dailyNetProfit = stats.dailyNetProfit;
+            const journal = APP_STATE.currentJournal;
+
+            let html = '';
+
+            // Previous month's days
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month"></div>`;
+            }
+
+            // Current month's days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayAmount = dailyNetProfit[dateStr];
+                let dayClass = '';
+                let dayContent = `<div class="calendar-day-date">${day}</div>`;
+
+                if (dayAmount !== undefined) {
+                    const percentage = ((dayAmount / journal.targetAmount) * 100).toFixed(0);
+                    if (dayAmount > 0) {
+                        dayClass = 'profit';
+                        dayContent += `<div class="calendar-day-amount">+₹${Math.abs(dayAmount).toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>`;
+                        dayContent += `<div class="calendar-day-percentage">${percentage}%</div>`;
+                    } else if (dayAmount < 0) {
+                        dayClass = 'loss';
+                        dayContent += `<div class="calendar-day-amount">-₹${Math.abs(dayAmount).toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>`;
+                        dayContent += `<div class="calendar-day-percentage">${percentage}%</div>`;
+                    } else {
+                        dayClass = 'neutral';
+                    }
+                } else {
+                    dayClass = 'neutral';
+                }
+
+                html += `<div class="calendar-day ${dayClass}" onclick="selectDate('${dateStr}')">${dayContent}</div>`;
+            }
+
+            // Next month's days
+            const remainingDays = 42 - (startingDayOfWeek + daysInMonth);
+            for (let i = 1; i <= remainingDays; i++) {
+                html += `<div class="calendar-day other-month"></div>`;
+            }
+
+            document.getElementById('calendarDays').innerHTML = html;
+        }
+
+        function previousMonth() {
+            APP_STATE.currentMonth.setMonth(APP_STATE.currentMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            APP_STATE.currentMonth.setMonth(APP_STATE.currentMonth.getMonth() + 1);
+            renderCalendar();
+        }
+
+        async function selectDate(dateStr) {
+            APP_STATE.selectedDate = dateStr;
+
+            // Update calendar UI
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+            event.target.closest('.calendar-day').classList.add('selected');
+
+            // Load transactions for this date
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getTransactionsByDate',
+                        journalId: APP_STATE.currentJournal.journalId,
+                        username: APP_STATE.currentUser,
+                        date: dateStr
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayDateTransactions(data.data, dateStr);
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        function displayDateTransactions(data, dateStr) {
+            const container = document.getElementById('dateTransactionContainer');
+            const listContainer = document.getElementById('dateTransactionList');
+            const titleEl = document.getElementById('dateTransactionTitle');
+
+            titleEl.textContent = `Transactions for ${formatDate(dateStr)}`;
+
+            document.getElementById('dateTotalProfit').textContent = `₹${parseFloat(data.totalProfit).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('dateTotalLoss').textContent = `₹${parseFloat(data.totalLoss).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+
+            const netPL = data.netPL;
+            const netPLEl = document.getElementById('dateNetPL');
+            netPLEl.textContent = `₹${Math.abs(netPL).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            netPLEl.className = 'stat-value ' + (netPL > 0 ? 'profit' : netPL < 0 ? 'loss' : 'neutral');
+
+            if (data.transactions.length > 0) {
+                listContainer.innerHTML = data.transactions.map(txn => {
+                    const time = new Date(txn.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                    const amount = parseFloat(txn.amount);
+                    return `
+                        <div class="transaction-item">
+                            <div class="transaction-left">
+                                <div class="transaction-type">${txn.type === 'PROFIT' ? '📈 Profit' : '📉 Loss'}</div>
+                                <div class="transaction-time">${time}</div>
+                            </div>
+                            <div class="transaction-right">
+                                <div class="transaction-amount ${txn.type === 'PROFIT' ? 'profit' : 'loss'}">
+                                    ${txn.type === 'PROFIT' ? '+' : '-'}₹${amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                listContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No transactions for this date</p>';
+            }
+
+            container.style.display = 'block';
+        }
+
+        // ============================================================================
+        // QUICK ACTIONS
+        // ============================================================================
+
+        function selectTransactionType(type) {
+            APP_STATE.selectedTransactionType = type;
+            document.getElementById('btnProfit').classList.remove('selected');
+            document.getElementById('btnLoss').classList.remove('selected');
+
+            if (type === 'PROFIT') {
+                document.getElementById('btnProfit').classList.add('selected');
+            } else if (type === 'LOSS') {
+                document.getElementById('btnLoss').classList.add('selected');
+            }
+        }
+
+        async function handleAddTransaction() {
+            if (!APP_STATE.selectedTransactionType) {
+                alert('Please select PROFIT or LOSS');
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('quickAmount').value);
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'addTransaction',
+                        journalId: APP_STATE.currentJournal.journalId,
+                        username: APP_STATE.currentUser,
+                        type: APP_STATE.selectedTransactionType,
+                        amount: amount,
+                        transactionDate: today
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Clear form
+                    document.getElementById('quickAmount').value = '';
+                    selectTransactionType(null);
+
+                    // Reload journal details to update everything
+                    await refreshJournalData();
+                }
+            } catch (error) {
+                console.error('Error adding transaction:', error);
+                alert('Error adding transaction');
+            }
+        }
+
+        async function refreshJournalData() {
+            try {
+                const response = await fetch(APP_STATE.appScriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getJournalDetails',
+                        journalId: APP_STATE.currentJournal.journalId,
+                        username: APP_STATE.currentUser
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    APP_STATE.currentJournal = data.data.journal;
+                    APP_STATE.allTransactions = data.data.transactions;
+                    updateJournalHeader();
+                    renderCalendar();
+                    updateRecentTransactions();
+                }
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+            }
+        }
+
+        // ============================================================================
+        // RECENT TRANSACTIONS
+        // ============================================================================
+
+        function updateRecentTransactions() {
+            const container = document.getElementById('recentTransactionList');
+            const transactions = APP_STATE.allTransactions
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .slice(0, 20);
+
+            if (transactions.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No transactions yet</p>';
+                return;
+            }
+
+            container.innerHTML = transactions.map(txn => {
+                const time = new Date(txn.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const date = formatDate(txn.transactionDate);
+                const amount = parseFloat(txn.amount);
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-type">${txn.type === 'PROFIT' ? '📈 Profit' : '📉 Loss'}</div>
+                            <div class="transaction-time">${date} at ${time}</div>
+                        </div>
+                        <div class="transaction-right">
+                            <div class="transaction-amount ${txn.type === 'PROFIT' ? 'profit' : 'loss'}">
+                                ${txn.type === 'PROFIT' ? '+' : '-'}₹${amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================================
+        // UTILITIES
+        // ============================================================================
+
+        function formatDate(dateStr) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', options);
+        }
+    </script>
+</body>
+</html>
