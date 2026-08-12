@@ -135,6 +135,16 @@ const nextMonthBtn = document.getElementById('nextMonth');
 if (nextMonthBtn) {
     nextMonthBtn.addEventListener('click', nextMonth);
 }
+    
+    // Quick Action - Profit
+const btnProfit = document.getElementById('btnProfit');
+
+if (btnProfit) {
+    btnProfit.addEventListener('click', function () {
+        selectTransactionType('PROFIT');
+    });
+}
+
 
     // Quick Action - Loss
     const btnLoss = document.getElementById('btnLoss');
