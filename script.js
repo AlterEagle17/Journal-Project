@@ -9,7 +9,7 @@ const APP_STATE = {
     selectedDate: null,
     selectedTransactionType: null,
     currentMonth: new Date(),
-    appScriptUrl: 'https://script.google.com/macros/s/AKfycbwDdBJwGB6ieg4yEihGcp0FHq9o27w5u5UESPmEo-GkaQxOy0RIKj-TjusSKkP6Ujw-vQ/exec'
+    appScriptUrl: 'https://script.google.com/macros/s/AKfycbxr6k2jquWNrlHP5uuwbbhQrugjvs3qXCW4x5hsH6LYbJBjBgkyVCHc6bTrY6sWlXJPeg/exec'
 };
 
 // ============================================================================
