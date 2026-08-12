@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profit Journal - Trading Journal App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#070b12">
+    <title>Profit Journal</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%2300d4ff'>₹</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -20,11 +21,11 @@
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                        <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
                     </div>
                     <button type="submit" class="btn-login">Login</button>
                     <div class="login-error" id="loginError"></div>
@@ -164,7 +165,7 @@
                         <!-- TRANSACTION HISTORY FOR SELECTED DATE -->
                         <div class="transaction-container" id="dateTransactionContainer" style="display: none;">
                             <h2 id="dateTransactionTitle">Transactions for Date</h2>
-                            <div id="dateTransactionStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div id="dateTransactionStats" class="date-transaction-stats">
                                 <div class="stat-box">
                                     <div class="stat-label">Total Profit</div>
                                     <div class="stat-value profit" id="dateTotalProfit">₹0</div>
@@ -191,7 +192,7 @@
                             <div class="quick-action-input">
                                 <div class="input-group">
                                     <label>Amount</label>
-                                    <input type="number" id="quickAmount" placeholder="₹ 1250" step="0.01" min="0">
+                                    <input type="number" id="quickAmount" placeholder="Enter amount" inputmode="decimal" step="0.01" min="0" aria-label="Transaction amount">
                                 </div>
                                 <button class="btn-add" id="btnAddTransaction">Add Transaction</button>
                             </div>
