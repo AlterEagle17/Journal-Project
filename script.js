@@ -123,27 +123,18 @@ function setupEventListeners() {
         );
     }
 
-    // Calendar navigation
-    const prevMonth = document.getElementById('prevMonth');
+   // Calendar navigation
+const prevMonthBtn = document.getElementById('prevMonth');
 
-    if (prevMonth) {
-        prevMonth.addEventListener('click', previousMonth);
-    }
+if (prevMonthBtn) {
+    prevMonthBtn.addEventListener('click', previousMonth);
+}
 
-    const nextMonth = document.getElementById('nextMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
 
-    if (nextMonth) {
-        nextMonth.addEventListener('click', nextMonth);
-    }
-
-    // Quick Action - Profit
-    const btnProfit = document.getElementById('btnProfit');
-
-    if (btnProfit) {
-        btnProfit.addEventListener('click', function () {
-            selectTransactionType('PROFIT');
-        });
-    }
+if (nextMonthBtn) {
+    nextMonthBtn.addEventListener('click', nextMonth);
+}
 
     // Quick Action - Loss
     const btnLoss = document.getElementById('btnLoss');
