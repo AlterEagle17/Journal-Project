@@ -949,7 +949,7 @@ function openCreateJournalModal() {
 
     setDefaultDates();
 
-    modal.classList.add('show');
+    modal.classList.add('active');
 }
 
 function closeCreateJournalModal() {
@@ -963,7 +963,7 @@ function closeCreateJournalModal() {
         return;
     }
 
-    modal.classList.remove('show');
+    modal.classList.remove('active');
 }
 
 // ============================================================================
