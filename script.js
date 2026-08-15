@@ -85,7 +85,7 @@ function setupEventListeners() {
         logoutBtn.addEventListener('click', handleLogout);
     }
 
-    // Create Journal
+    /* Create Journal
     const createJournalBtn = document.getElementById('createJournalBtn');
 
     if (createJournalBtn) {
@@ -121,7 +121,45 @@ function setupEventListeners() {
             'submit',
             handleCreateJournal
         );
-    }
+    } */
+
+    // Create Journal
+const createJournalBtn = document.getElementById('createJournalBtn');
+
+if (createJournalBtn) {
+    createJournalBtn.addEventListener(
+        'click',
+        openCreateJournalModal
+    );
+}
+
+const closeCreateModal = document.getElementById('closeCreateModal');
+
+if (closeCreateModal) {
+    closeCreateModal.addEventListener(
+        'click',
+        closeCreateJournalModal
+    );
+}
+
+const cancelCreateModal = document.getElementById('cancelCreateModal');
+
+if (cancelCreateModal) {
+    cancelCreateModal.addEventListener(
+        'click',
+        closeCreateJournalModal
+    );
+}
+
+const createJournalForm =
+    document.getElementById('createJournalForm');
+
+if (createJournalForm) {
+    createJournalForm.addEventListener(
+        'submit',
+        handleCreateJournal
+    );
+}
 
    // Calendar navigation
 const prevMonthBtn = document.getElementById('prevMonth');
