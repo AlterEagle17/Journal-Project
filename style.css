@@ -1,8 +1,85 @@
+/* =========================================================
+   PROFIT JOURNAL
+   COMPLETE RESPONSIVE STYLE
+   Desktop + Tablet + Mobile
+   ========================================================= */
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
+html {
+    width: 100%;
+    min-height: 100%;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(104, 215, 168, 0.12),
+            transparent 22%
+        ),
+        radial-gradient(
+            circle at top right,
+            rgba(110, 173, 255, 0.10),
+            transparent 28%
+        ),
+        linear-gradient(
+            180deg,
+            #070b12 0%,
+            #091018 100%
+        );
+    color: #edf3f8;
+    overflow-x: hidden;
+}
+
+button,
+input,
+select {
+    font: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    touch-action: manipulation;
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select {
+    outline: none;
+}
+
+::selection {
+    background: rgba(104, 215, 168, 0.22);
+    color: #edf3f8;
+}
+
+
+/* =========================================================
+   VARIABLES
+   ========================================================= */
 
 :root {
     --bg-base: #070b12;
@@ -11,62 +88,47 @@
     --bg-card: #111b2a;
     --bg-card-strong: #152537;
     --bg-input: #0d1724;
-    --bg-soft: rgba(156, 172, 186, 0.08);
+
     --primary-color: #a8f3d8;
     --primary-strong: #68d7a8;
+
     --success-color: #62dca1;
     --success-soft: rgba(98, 220, 161, 0.12);
-    --success-border: rgba(98, 220, 161, 0.4);
+    --success-border: rgba(98, 220, 161, 0.40);
+
     --danger-color: #f08a7b;
     --danger-soft: rgba(240, 138, 123, 0.12);
     --danger-border: rgba(240, 138, 123, 0.38);
+
     --warning-color: #f3b86d;
+
     --text-primary: #edf3f8;
     --text-secondary: #a6b8c9;
     --text-muted: #76879a;
+
     --border-color: rgba(159, 176, 191, 0.17);
-    --shadow-soft: 0 24px 52px rgba(6, 10, 16, 0.46);
-    --shadow-card: 0 12px 32px rgba(7, 13, 20, 0.38);
+
+    --shadow-soft:
+        0 24px 52px rgba(6, 10, 16, 0.46);
+
+    --shadow-card:
+        0 12px 32px rgba(7, 13, 20, 0.38);
+
     --radius-lg: 22px;
     --radius-md: 16px;
     --radius-sm: 12px;
+
     --container-width: 1560px;
 }
 
-html, body {
-    width: 100%;
-    min-height: 100%;
-    font-family: Inter, "Segoe UI", Arial, sans-serif;
-    background: radial-gradient(circle at top left, rgba(104, 215, 168, 0.12), transparent 22%),
-        radial-gradient(circle at top right, rgba(110, 173, 255, 0.10), transparent 28%),
-        linear-gradient(180deg, var(--bg-base) 0%, #091018 100%);
-    color: var(--text-primary);
-    overflow-x: hidden;
-}
 
-body {
-    min-height: 100vh;
-}
-
-*::selection {
-    background: rgba(104, 215, 168, 0.22);
-    color: var(--text-primary);
-}
-
-img, svg {
-    display: block;
-    max-width: 100%;
-}
-
-button, input {
-    font: inherit;
-}
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
 
 .container {
-    display: flex;
     width: 100%;
     min-height: 100vh;
-    overflow: hidden;
 }
 
 #appContainer {
@@ -76,105 +138,51 @@ button, input {
     background: rgba(8, 13, 18, 0.72);
 }
 
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
 
-.content-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(17, 27, 39, 0.66);
-    border-bottom: 1px solid var(--border-color);
-    padding: 20px clamp(20px, 3vw, 32px);
-    backdrop-filter: blur(18px);
-}
-
-#headerActions {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.header-clock {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    padding: 10px 14px;
-    min-width: 180px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    text-align: right;
-}
-
-.header-clock .clock-time {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    letter-spacing: -0.01em;
-}
-
-.header-clock .clock-date {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-}
-
-.header-clock .clock-countdown {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-}
-
-.content-header h1 {
-    margin: 0;
-    font-size: clamp(1.5rem, 2vw, 2.2rem);
-    letter-spacing: -0.06em;
-    font-weight: 800;
-    color: var(--text-primary);
-}
-
-.content-area {
-    flex: 1;
-    overflow-y: auto;
-    padding: clamp(18px, 2.4vw, 30px);
-}
-
-.page {
-    display: none;
-    width: min(100%, var(--container-width));
-    margin: 0 auto;
-}
-
-.page.active {
-    display: block;
-}
+/* =========================================================
+   LOGIN
+   ========================================================= */
 
 .login-container {
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 100%;
     min-height: 100vh;
-    padding: clamp(20px, 4vw, 52px);
-    background: radial-gradient(circle at top, rgba(104, 215, 168, 0.08), transparent 30%),
-        linear-gradient(160deg, #050b13 0%, #0d141d 42%, #0d1622 100%);
+
+    padding: 32px;
+
     position: relative;
     overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(104, 215, 168, 0.08),
+            transparent 30%
+        ),
+        linear-gradient(
+            160deg,
+            #050b13 0%,
+            #0d141d 42%,
+            #0d1622 100%
+        );
 }
 
 .login-container::before,
 .login-container::after {
     content: "";
     position: absolute;
+
     width: 30rem;
     height: 30rem;
+
     border-radius: 50%;
+
     filter: blur(60px);
     opacity: 0.28;
+
     z-index: 0;
 }
 
@@ -193,38 +201,49 @@ button, input {
 .login-box {
     position: relative;
     z-index: 1;
+
     width: min(100%, 460px);
-    padding: clamp(28px, 4vw, 42px);
+
+    padding: 42px;
+
     background: rgba(15, 23, 31, 0.78);
+
     border: 1px solid var(--border-color);
     border-radius: 24px;
+
     box-shadow: var(--shadow-soft);
+
     backdrop-filter: blur(18px);
 }
 
 .login-brand {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 14px;
+    align-items: center;
+
     margin-bottom: 22px;
 }
 
 .login-box h1 {
-    font-size: clamp(2rem, 3.2vw, 2.7rem);
+    font-size: 2.7rem;
     line-height: 1.1;
+
     letter-spacing: -0.06em;
-    margin: 0 0 10px;
+
+    margin-bottom: 10px;
+
     text-transform: uppercase;
+
     color: var(--text-primary);
     font-weight: 800;
 }
 
-.login-box p {
-    margin: 0 0 26px;
+.login-box > p {
+    margin-bottom: 26px;
+
     color: var(--text-secondary);
+
     font-size: 0.94rem;
-    letter-spacing: 0.02em;
 }
 
 .form-group {
@@ -234,10 +253,14 @@ button, input {
 
 .form-group label {
     display: block;
+
     margin-bottom: 8px;
+
     color: var(--text-secondary);
+
     font-size: 0.72rem;
     font-weight: 600;
+
     text-transform: uppercase;
     letter-spacing: 0.12em;
 }
@@ -245,14 +268,17 @@ button, input {
 .form-group input {
     width: 100%;
     min-height: 48px;
+
     padding: 0 16px;
-    background: rgba(9, 17, 24, 0.9);
+
+    background: rgba(9, 17, 24, 0.90);
+
     border: 1px solid var(--border-color);
     border-radius: 12px;
+
     color: var(--text-primary);
+
     font-size: 0.98rem;
-    outline: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .form-group input::placeholder {
@@ -261,34 +287,55 @@ button, input {
 
 .form-group input:focus {
     border-color: rgba(104, 215, 168, 0.66);
-    box-shadow: 0 0 0 4px rgba(104, 215, 168, 0.08);
+
+    box-shadow:
+        0 0 0 4px rgba(104, 215, 168, 0.08);
+
     background: rgba(13, 23, 31, 0.98);
 }
 
 .btn-login {
     width: 100%;
     min-height: 50px;
-    padding: 0 18px;
-    background: linear-gradient(135deg, var(--primary-strong) 0%, var(--success-color) 100%);
-    color: rgba(8, 16, 20, 0.9);
+
     border: 1px solid rgba(104, 215, 168, 0.25);
     border-radius: 12px;
-    font-weight: 800;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-strong),
+            var(--success-color)
+        );
+
+    color: rgba(8, 16, 20, 0.90);
+
     font-size: 0.8rem;
+    font-weight: 800;
+
     letter-spacing: 0.14em;
     text-transform: uppercase;
+
     cursor: pointer;
-    box-shadow: 0 16px 34px rgba(52, 183, 125, 0.25);
+
+    box-shadow:
+        0 16px 34px rgba(52, 183, 125, 0.25);
 }
 
 .login-error {
     display: none;
-    color: var(--danger-color);
-    font-size: 0.78rem;
+
     margin-top: 16px;
     padding: 10px 12px;
+
+    color: var(--danger-color);
+
+    font-size: 0.78rem;
+
     background: rgba(255, 106, 106, 0.08);
-    border: 1px solid rgba(255, 106, 106, 0.2);
+
+    border: 1px solid rgba(255, 106, 106, 0.20);
+
     border-radius: 10px;
 }
 
@@ -296,365 +343,828 @@ button, input {
     display: block;
 }
 
-.mobile-header {
-    display: none;
+
+/* =========================================================
+   BRAND MARK
+   ========================================================= */
+
+.brand-mark {
+    width: 52px;
+    height: 52px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(104, 215, 168, 0.20),
+            rgba(255, 255, 255, 0.08)
+        );
+
+    border: 1px solid rgba(104, 215, 168, 0.35);
+
+    color: var(--primary-color);
+
+    font-weight: 800;
+    font-size: 1rem;
+
+    letter-spacing: 0.06em;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+
+/* =========================================================
+   DESKTOP APP LAYOUT
+   ========================================================= */
+
+#appContainer {
+    flex-direction: row;
 }
 
 .sidebar {
     width: 280px;
-    background: rgba(16, 24, 33, 0.84);
-    border-right: 1px solid var(--border-color);
+    flex: 0 0 280px;
+
+    min-height: 100vh;
+
     display: flex;
     flex-direction: column;
+
     padding: 22px 18px 18px;
+
+    background: rgba(16, 24, 33, 0.84);
+
+    border-right: 1px solid var(--border-color);
+
     backdrop-filter: blur(24px);
-    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.02);
+
+    box-shadow:
+        inset -1px 0 0 rgba(255, 255, 255, 0.02);
 }
 
 .sidebar-header {
     display: flex;
     align-items: center;
+
     gap: 12px;
+
     padding: 4px 6px 18px;
     margin-bottom: 18px;
-    border-bottom: 1px solid var(--border-color);
-}
 
-.brand-mark {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, rgba(104, 215, 168, 0.2), rgba(255, 255, 255, 0.08));
-    border: 1px solid rgba(104, 215, 168, 0.35);
-    color: var(--primary-color);
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    font-size: 1rem;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-header .brand-mark {
     width: 40px;
     height: 40px;
+
     border-radius: 12px;
+
     font-size: 0.76rem;
-    letter-spacing: 0.05em;
 }
 
 .sidebar-header h2 {
     font-size: 0.98rem;
     line-height: 1.15;
+
     letter-spacing: 0.08em;
+
     text-transform: uppercase;
+
     font-weight: 800;
+
     color: var(--text-primary);
 }
 
 .user-info {
     padding: 12px 14px;
+
     border-radius: 14px;
+
     background: rgba(104, 215, 168, 0.06);
-    border: 1px solid rgba(104, 215, 168, 0.1);
+
+    border: 1px solid rgba(104, 215, 168, 0.10);
+
     margin-bottom: 18px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .user-info p {
     margin: 0;
-    font-size: 0.7rem;
+
+    font-size: 0.70rem;
+
     letter-spacing: 0.09em;
     text-transform: uppercase;
+
     color: var(--text-secondary);
 }
 
 #currentUsername {
     display: block;
+
     margin-top: 7px;
+
     font-size: 0.92rem;
-    letter-spacing: 0.02em;
+
     color: var(--primary-color);
+
     font-weight: 700;
+
     text-transform: none;
+
+    overflow-wrap: anywhere;
 }
 
 .sidebar-nav {
     display: flex;
     flex-direction: column;
+
     gap: 8px;
+
     flex: 1;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
+
     gap: 12px;
+
     width: 100%;
     min-height: 44px;
+
     padding: 12px 14px;
+
     background: rgba(255, 255, 255, 0.01);
+
     border-radius: 12px;
+
     border: 1px solid transparent;
+
     color: var(--text-secondary);
+
     cursor: pointer;
+
     user-select: none;
+
     font-size: 0.94rem;
     font-weight: 600;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
 }
 
 .nav-item .nav-icon {
     width: 18px;
     height: 18px;
+
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
+
     color: currentColor;
-    opacity: 0.9;
 }
 
 .nav-item:hover {
     background: rgba(104, 215, 168, 0.04);
+
     border-color: rgba(104, 215, 168, 0.18);
+
     color: var(--primary-color);
+
     transform: translateX(2px);
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, rgba(104, 215, 168, 0.12), rgba(255, 255, 255, 0.02));
+    background:
+        linear-gradient(
+            135deg,
+            rgba(104, 215, 168, 0.12),
+            rgba(255, 255, 255, 0.02)
+        );
+
     border-color: rgba(104, 215, 168, 0.22);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
     color: var(--primary-color);
 }
 
 .sidebar-footer {
     padding-top: 18px;
+
     border-top: 1px solid var(--border-color);
 }
 
 .btn-logout {
     width: 100%;
     min-height: 42px;
+
     border: 1px solid rgba(255, 106, 106, 0.25);
+
     border-radius: 12px;
+
     background: rgba(255, 106, 106, 0.06);
+
     color: var(--danger-color);
+
     font-weight: 700;
+
     letter-spacing: 0.08em;
+
     text-transform: uppercase;
+
     cursor: pointer;
 }
 
-.btn-logout:hover {
-    background: rgba(255, 106, 106, 0.12);
-    transform: translateY(-1px);
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.main-content {
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
 }
+
+.content-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    min-height: 78px;
+
+    padding: 18px 32px;
+
+    background: rgba(17, 27, 39, 0.66);
+
+    border-bottom: 1px solid var(--border-color);
+
+    backdrop-filter: blur(18px);
+}
+
+.content-header h1 {
+    margin: 0;
+
+    min-width: 0;
+
+    font-size: clamp(1.5rem, 2vw, 2.2rem);
+
+    letter-spacing: -0.06em;
+
+    font-weight: 800;
+
+    color: var(--text-primary);
+}
+
+#headerActions {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   CURRENCY CONTROL
+   ========================================================= */
+
+.currency-control {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 10px;
+
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.currency-label {
+    color: var(--text-muted);
+
+    font-size: 0.65rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+.currency-select {
+    min-height: 34px;
+
+    padding: 0 28px 0 9px;
+
+    border-radius: 9px;
+
+    border: 1px solid rgba(104, 215, 168, 0.20);
+
+    background: rgba(9, 17, 24, 0.90);
+
+    color: var(--primary-color);
+
+    font-size: 0.76rem;
+
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.currency-select option {
+    background: #0d1724;
+    color: #edf3f8;
+}
+
+
+/* =========================================================
+   KOLKATA CLOCK
+   ========================================================= */
+
+.header-clock {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 3px;
+
+    min-width: 190px;
+
+    padding: 9px 13px;
+
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    text-align: right;
+}
+
+.clock-time {
+    color: var(--primary-color);
+
+    font-size: 0.88rem;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.clock-date {
+    color: var(--text-secondary);
+
+    font-size: 0.70rem;
+
+    white-space: nowrap;
+}
+
+.clock-countdown {
+    color: var(--text-muted);
+
+    font-size: 0.64rem;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CONTENT AREA
+   ========================================================= */
+
+.content-area {
+    flex: 1;
+
+    min-width: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 30px;
+}
+
+.page {
+    display: none;
+
+    width: min(100%, var(--container-width));
+
+    margin: 0 auto;
+}
+
+.page.active {
+    display: block;
+
+    animation: fadeIn 0.24s ease-out;
+}
+
+
+/* =========================================================
+   MOBILE HEADER
+   ========================================================= */
+
+.mobile-header {
+    display: none;
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
 
 .dashboard-header {
     display: flex;
+
     justify-content: flex-end;
     align-items: center;
+
     margin-bottom: 22px;
 }
 
 .btn-create-journal {
     min-height: 44px;
+
     padding: 0 18px;
+
     border-radius: 12px;
-    border: 1px solid rgba(104, 215, 168, 0.2);
-    background: linear-gradient(135deg, rgba(104, 215, 168, 0.12), rgba(52, 183, 125, 0.12));
+
+    border: 1px solid rgba(104, 215, 168, 0.20);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(104, 215, 168, 0.12),
+            rgba(52, 183, 125, 0.12)
+        );
+
     color: var(--primary-color);
+
     font-weight: 700;
+
     letter-spacing: 0.08em;
+
     text-transform: uppercase;
+
     cursor: pointer;
 }
 
 .journals-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(260px, 1fr)
+        );
+
     gap: 18px;
 }
 
 .journal-card {
     position: relative;
+
     display: flex;
     flex-direction: column;
+
     gap: 10px;
+
     min-height: 210px;
+
     padding: 20px 18px 18px;
-    background: linear-gradient(180deg, rgba(23, 33, 43, 0.96), rgba(14, 22, 30, 0.96));
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(23, 33, 43, 0.96),
+            rgba(14, 22, 30, 0.96)
+        );
+
     border: 1px solid var(--border-color);
+
     border-radius: var(--radius-lg);
+
     cursor: pointer;
+
     box-shadow: var(--shadow-card);
+
     overflow: hidden;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .journal-card::before {
     content: "";
+
     position: absolute;
-    inset: 0 auto auto 0;
+
+    left: 0;
+    top: 0;
+
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg, rgba(104, 215, 168, 0.9), rgba(146, 202, 255, 0.2));
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(104, 215, 168, 0.90),
+            rgba(146, 202, 255, 0.20)
+        );
 }
 
 .journal-card:hover {
     transform: translateY(-3px);
+
     border-color: rgba(104, 215, 168, 0.26);
-    box-shadow: 0 18px 34px rgba(5, 10, 18, 0.52);
+
+    box-shadow:
+        0 18px 34px rgba(5, 10, 18, 0.52);
 }
 
 .journal-card h3 {
     margin: 0;
+
     color: var(--text-primary);
+
     font-size: 1.08rem;
+
     line-height: 1.25;
+
     font-weight: 700;
+
+    overflow-wrap: anywhere;
 }
 
 .journal-card p {
     margin: 0;
+
     color: var(--text-secondary);
+
     font-size: 0.82rem;
+
     line-height: 1.55;
+
+    overflow-wrap: anywhere;
 }
 
 .journal-card .progress-bar {
     width: 100%;
     height: 8px;
+
     margin-top: 6px;
+
     background: rgba(255, 255, 255, 0.05);
+
     border: 1px solid rgba(255, 255, 255, 0.04);
+
     border-radius: 999px;
+
     overflow: hidden;
 }
 
 .journal-card .progress-fill {
     height: 100%;
+
     border-radius: inherit;
-    background: linear-gradient(90deg, var(--primary-strong), var(--success-color));
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary-strong),
+            var(--success-color)
+        );
 }
 
-.journal-card .card-actions {
+.card-actions {
     margin-top: auto;
+
     display: flex;
+
     gap: 10px;
 }
 
 .btn-small {
     flex: 1;
-    min-height: 36px;
-    border-radius: 10px;
-    border: 1px solid rgba(104, 215, 168, 0.2);
-    background: rgba(104, 215, 168, 0.06);
-    color: var(--primary-color);
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    cursor: pointer;
-}
 
-.btn-small:hover {
-    background: rgba(104, 215, 168, 0.14);
+    min-height: 36px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(104, 215, 168, 0.20);
+
+    background: rgba(104, 215, 168, 0.06);
+
+    color: var(--primary-color);
+
+    font-weight: 700;
+
+    font-size: 0.72rem;
+
+    letter-spacing: 0.09em;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
 }
 
 .btn-delete {
     border-color: rgba(255, 106, 106, 0.26);
-    background: rgba(255, 106, 106, 0.06);
-    color: var(--danger-color);
-}
 
-.btn-delete:hover {
-    background: rgba(255, 106, 106, 0.12);
+    background: rgba(255, 106, 106, 0.06);
+
+    color: var(--danger-color);
 }
 
 .empty-state {
     display: grid;
     place-items: center;
+
     min-height: 260px;
+
     padding: 32px 18px;
+
     border-radius: var(--radius-lg);
+
     border: 1px solid var(--border-color);
-    background: linear-gradient(180deg, rgba(17, 27, 39, 0.9), rgba(14, 22, 30, 0.9));
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(17, 27, 39, 0.90),
+            rgba(14, 22, 30, 0.90)
+        );
+
     text-align: center;
 }
 
 .empty-state h2 {
-    margin: 0 0 10px;
+    margin-bottom: 10px;
+
     font-size: 1.34rem;
+
     color: var(--text-primary);
 }
 
 .empty-state p {
-    margin: 0;
     color: var(--text-secondary);
 }
 
+
+/* =========================================================
+   JOURNAL HEADER
+   ========================================================= */
+
 .journal-header {
-    background: linear-gradient(180deg, rgba(18, 30, 45, 0.97), rgba(12, 20, 28, 0.98));
+    background:
+        linear-gradient(
+            180deg,
+            rgba(18, 30, 45, 0.97),
+            rgba(12, 20, 28, 0.98)
+        );
+
     border: 1px solid var(--border-color);
+
     border-radius: var(--radius-lg);
-    padding: clamp(20px, 2.8vw, 28px);
+
+    padding: 28px;
+
     margin-bottom: 24px;
+
     box-shadow: var(--shadow-card);
 }
 
 .journal-title {
-    margin: 0 0 20px;
+    margin-bottom: 20px;
+
     font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+
     letter-spacing: -0.05em;
+
     line-height: 1.1;
+
     font-weight: 800;
+
     color: var(--text-primary);
+
+    overflow-wrap: anywhere;
 }
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(170px, 1fr)
+        );
+
     gap: 14px;
+
     margin-bottom: 18px;
 }
 
 .stat-box {
     position: relative;
-    padding: 16px 18px;
-    background: linear-gradient(180deg, rgba(15, 24, 32, 0.9), rgba(11, 17, 24, 0.96));
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+
+    min-width: 0;
+
     min-height: 104px;
+
+    padding: 16px 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(15, 24, 32, 0.90),
+            rgba(11, 17, 24, 0.96)
+        );
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 16px;
 }
 
 .stat-box::before {
     content: "";
+
     position: absolute;
-    width: 42px;
-    height: 2px;
+
     left: 18px;
     top: 16px;
+
+    width: 42px;
+    height: 2px;
+
     border-radius: 999px;
-    background: linear-gradient(90deg, rgba(104, 215, 168, 0.8), transparent);
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(104, 215, 168, 0.80),
+            transparent
+        );
 }
 
 .stat-label {
     margin: 18px 0 10px;
+
     font-size: 0.68rem;
+
     font-weight: 700;
+
     letter-spacing: 0.12em;
+
     text-transform: uppercase;
+
     color: var(--text-secondary);
 }
 
 .stat-value {
     display: inline-block;
+
+    max-width: 100%;
+
     font-size: clamp(1.1rem, 2vw, 1.8rem);
+
     line-height: 1.1;
+
     font-weight: 800;
+
     letter-spacing: -0.05em;
+
     color: var(--text-primary);
+
+    overflow-wrap: anywhere;
 }
 
 .stat-value.profit {
@@ -669,71 +1179,106 @@ button, input {
     color: var(--text-primary);
 }
 
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
 .progress-section {
     margin-top: 18px;
+
     padding-top: 14px;
+
     border-top: 1px solid var(--border-color);
 }
 
 .progress-label {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 8px;
+
     margin-bottom: 10px;
+
     color: var(--text-secondary);
+
     font-size: 0.76rem;
+
     font-weight: 700;
+
     letter-spacing: 0.08em;
+
     text-transform: uppercase;
 }
 
 .progress-bar-large {
     width: 100%;
     height: 12px;
+
     border-radius: 999px;
+
     background: rgba(255, 255, 255, 0.05);
+
     border: 1px solid rgba(255, 255, 255, 0.05);
+
     overflow: hidden;
-    position: relative;
 }
 
 .progress-fill-large {
     height: 100%;
+
     border-radius: inherit;
-    background: linear-gradient(90deg, rgba(104, 215, 168, 0.95), rgba(94, 230, 168, 0.95));
-    box-shadow: 0 0 14px rgba(104, 215, 168, 0.28);
-    position: relative;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(104, 215, 168, 0.95),
+            rgba(94, 230, 168, 0.95)
+        );
+
+    box-shadow:
+        0 0 14px rgba(104, 215, 168, 0.28);
 }
 
-.progress-fill-large::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 2px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-}
+
+/* =========================================================
+   SHARED PANELS
+   ========================================================= */
 
 .calendar-container,
 .transaction-container,
 .quick-action-container,
 .insights-container {
-    background: linear-gradient(180deg, rgba(18, 30, 45, 0.97), rgba(12, 20, 28, 0.98));
+    background:
+        linear-gradient(
+            180deg,
+            rgba(18, 30, 45, 0.97),
+            rgba(12, 20, 28, 0.98)
+        );
+
     border: 1px solid var(--border-color);
+
     border-radius: var(--radius-lg);
-    padding: clamp(18px, 2vw, 24px);
+
+    padding: 24px;
+
     margin-bottom: 24px;
+
     box-shadow: var(--shadow-card);
+
+    min-width: 0;
 }
 
 .calendar-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 12px;
+
     margin-bottom: 16px;
 }
 
@@ -742,90 +1287,150 @@ button, input {
 .quick-action-container h2,
 .insights-container h2 {
     margin: 0 0 18px;
+
     font-size: 1rem;
+
     letter-spacing: 0.08em;
+
     text-transform: uppercase;
+
     color: var(--primary-color);
+
     font-weight: 800;
 }
 
+
+/* =========================================================
+   CALENDAR NAVIGATION
+   ========================================================= */
+
 .calendar-nav {
     display: flex;
+
     align-items: center;
+
     gap: 10px;
+
+    min-width: 0;
 }
 
 .btn-nav {
     width: 38px;
     height: 38px;
-    border-radius: 10px;
-    border: 1px solid rgba(104, 215, 168, 0.2);
-    background: rgba(104, 215, 168, 0.06);
-    color: var(--primary-color);
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-}
 
-.btn-nav:hover {
-    background: rgba(104, 215, 168, 0.12);
-    transform: translateY(-1px);
+    flex: 0 0 38px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(104, 215, 168, 0.20);
+
+    background: rgba(104, 215, 168, 0.06);
+
+    color: var(--primary-color);
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    cursor: pointer;
 }
 
 .calendar-month {
     min-width: 180px;
+
     text-align: center;
+
     color: var(--text-primary);
+
     font-weight: 700;
-    letter-spacing: 0.02em;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+
+.calendar-weekdays,
+.calendar-days {
+    width: 100%;
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            7,
+            minmax(0, 1fr)
+        );
+
+    gap: 8px;
 }
 
 .calendar-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 8px;
     margin-bottom: 8px;
 }
 
 .weekday {
+    min-height: 34px;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
-    min-height: 34px;
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    font-weight: 700;
-}
 
-.calendar-days {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 8px;
+    color: var(--text-secondary);
+
+    font-size: 0.68rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
 }
 
 .calendar-day {
     position: relative;
+
+    min-width: 0;
+
+    min-height: 108px;
+
+    padding: 8px 6px;
+
     display: flex;
+
+    flex-direction: column;
+
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    min-height: 108px;
-    padding: 8px 6px;
+
     border: 1px solid var(--border-color);
+
     border-radius: 14px;
+
     background: rgba(9, 17, 24, 0.88);
+
     color: var(--text-secondary);
-    cursor: pointer;
+
     text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease;
 }
 
 .calendar-day:hover {
     border-color: rgba(104, 215, 168, 0.22);
+
     transform: translateY(-1px);
-    box-shadow: 0 12px 22px rgba(0, 0, 0, 0.14);
 }
 
 .calendar-day.other-month {
@@ -833,139 +1438,223 @@ button, input {
 }
 
 .calendar-day.profit {
-    background: linear-gradient(180deg, rgba(98, 220, 161, 0.14), rgba(9, 17, 24, 0.9));
+    background:
+        linear-gradient(
+            180deg,
+            rgba(98, 220, 161, 0.14),
+            rgba(9, 17, 24, 0.90)
+        );
+
     border-color: var(--success-border);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(98, 220, 161, 0.06);
 }
 
 .calendar-day.loss {
-    background: linear-gradient(180deg, rgba(240, 138, 123, 0.13), rgba(9, 17, 24, 0.9));
+    background:
+        linear-gradient(
+            180deg,
+            rgba(240, 138, 123, 0.13),
+            rgba(9, 17, 24, 0.90)
+        );
+
     border-color: var(--danger-border);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(240, 138, 123, 0.05);
 }
 
 .calendar-day.neutral {
     background: rgba(9, 17, 24, 0.88);
+
     border-color: var(--border-color);
-    color: var(--text-secondary);
 }
 
 .calendar-day.today {
-    border-color: rgba(104, 215, 168, 0.5);
-    box-shadow: 0 0 0 1px rgba(104, 215, 168, 0.14), 0 10px 22px rgba(104, 215, 168, 0.12);
+    border-color: rgba(104, 215, 168, 0.50);
+
+    box-shadow:
+        0 0 0 1px rgba(104, 215, 168, 0.14),
+        0 10px 22px rgba(104, 215, 168, 0.12);
 }
 
 .calendar-day.selected {
-    background: linear-gradient(180deg, rgba(104, 215, 168, 0.18), rgba(9, 17, 24, 0.9));
+    background:
+        linear-gradient(
+            180deg,
+            rgba(104, 215, 168, 0.18),
+            rgba(9, 17, 24, 0.90)
+        );
+
     border-color: rgba(104, 215, 168, 0.56);
-    box-shadow: 0 0 0 1px rgba(104, 215, 168, 0.16), 0 10px 28px rgba(84, 175, 138, 0.18);
 }
 
 .calendar-day.future {
-    opacity: 0.4;
+    opacity: 0.40;
 }
 
 .calendar-day.empty {
-    color: var(--text-muted);
+    cursor: default;
 }
 
 .calendar-day-date {
     align-self: flex-start;
+
+    max-width: 100%;
+
     font-size: 0.76rem;
+
     font-weight: 800;
+
     line-height: 1;
+
     margin-bottom: 8px;
+
     opacity: 0.85;
 }
 
 .calendar-day-amount {
+    max-width: 100%;
+
     font-size: clamp(0.68rem, 0.9vw, 0.9rem);
+
     line-height: 1.15;
+
     font-weight: 800;
+
     letter-spacing: -0.04em;
+
     white-space: nowrap;
-    text-align: center;
-    color: inherit;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
     margin-bottom: 4px;
 }
 
 .calendar-day-status {
+    max-width: 100%;
+
     font-size: 0.58rem;
+
     line-height: 1.1;
+
     letter-spacing: 0.12em;
+
     text-transform: uppercase;
-    color: inherit;
-    opacity: 0.9;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
 }
 
 .calendar-day.profit .calendar-day-amount,
-.calendar-day.profit .calendar-day-status,
-.calendar-day.today.profit .calendar-day-amount,
-.calendar-day.today.profit .calendar-day-status {
+.calendar-day.profit .calendar-day-status {
     color: var(--success-color);
 }
 
 .calendar-day.loss .calendar-day-amount,
-.calendar-day.loss .calendar-day-status,
-.calendar-day.today.loss .calendar-day-amount,
-.calendar-day.today.loss .calendar-day-status {
+.calendar-day.loss .calendar-day-status {
     color: var(--danger-color);
 }
 
-#dateTransactionStats {
+
+/* =========================================================
+   DATE TRANSACTION STATS
+   ========================================================= */
+
+#dateTransactionStats,
+.date-transaction-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+
     margin-bottom: 18px;
 }
 
+#dateTransactionStats > *,
+.date-transaction-stats > * {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   TRANSACTION LIST
+   ========================================================= */
+
 .transaction-list {
     display: flex;
+
     flex-direction: column;
+
     gap: 10px;
+
     max-height: 380px;
+
     overflow-y: auto;
+
+    min-width: 0;
 }
 
 .transaction-item {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 16px;
+
+    min-width: 0;
+
     padding: 14px 16px;
+
     background: rgba(9, 17, 24, 0.88);
+
     border: 1px solid var(--border-color);
+
     border-radius: 14px;
 }
 
-.transaction-item:hover {
-    border-color: rgba(104, 215, 168, 0.16);
-}
-
 .transaction-left {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
 }
 
 .transaction-type {
-    font-size: 0.9rem;
+    font-size: 0.90rem;
+
     font-weight: 700;
+
     color: var(--text-primary);
 }
 
 .transaction-time {
     color: var(--text-secondary);
+
     font-size: 0.72rem;
 }
 
 .transaction-right {
+    flex: 0 0 auto;
+
     text-align: right;
 }
 
 .transaction-amount {
     font-size: 0.96rem;
+
     font-weight: 800;
+
     letter-spacing: -0.04em;
-    margin-bottom: 4px;
 }
 
 .transaction-amount.profit {
@@ -980,83 +1669,134 @@ button, input {
     color: var(--text-primary);
 }
 
+
+/* =========================================================
+   QUICK ACTION
+   ========================================================= */
+
 .quick-action-buttons {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
     gap: 12px;
+
     margin-bottom: 16px;
 }
 
 .btn-action {
+    width: 100%;
+
     min-height: 60px;
+
     border-radius: 14px;
-    font-size: 0.8rem;
+
+    font-size: 0.80rem;
+
     font-weight: 800;
+
     letter-spacing: 0.12em;
+
     text-transform: uppercase;
+
     cursor: pointer;
+
     background: rgba(9, 17, 24, 0.88);
 }
 
 .btn-action.profit {
     border: 1px solid rgba(94, 230, 168, 0.26);
+
     color: var(--success-color);
+
     background: rgba(94, 230, 168, 0.06);
 }
 
 .btn-action.loss {
     border: 1px solid rgba(255, 106, 106, 0.26);
+
     color: var(--danger-color);
+
     background: rgba(255, 106, 106, 0.06);
 }
 
-.btn-action.selected {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
 .btn-action.profit.selected {
-    background: linear-gradient(135deg, rgba(94, 230, 168, 0.28), rgba(94, 230, 168, 0.08));
-    color: #dffef2;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(94, 230, 168, 0.28),
+            rgba(94, 230, 168, 0.08)
+        );
 }
 
 .btn-action.loss.selected {
-    background: linear-gradient(135deg, rgba(255, 106, 106, 0.28), rgba(255, 106, 106, 0.08));
-    color: #ffe3e3;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 106, 106, 0.28),
+            rgba(255, 106, 106, 0.08)
+        );
 }
 
 .quick-action-input {
     display: flex;
+
     align-items: center;
+
     gap: 12px;
+
+    min-width: 0;
 }
 
 .input-group {
     display: flex;
+
     align-items: center;
+
     flex: 1;
+
+    min-width: 0;
+
     min-height: 52px;
+
     padding: 0 14px;
+
     background: rgba(9, 17, 24, 0.88);
+
     border: 1px solid var(--border-color);
+
     border-radius: 14px;
 }
 
 .input-group label {
     flex-shrink: 0;
+
     color: var(--text-secondary);
+
     font-size: 0.82rem;
+
     font-weight: 700;
+
     margin-right: 8px;
 }
 
 .input-group input {
-    flex: 1;
+    width: 100%;
+
     min-width: 0;
+
     background: transparent;
+
     border: none;
-    outline: none;
+
     color: var(--text-primary);
+
     font-size: 1rem;
+
     font-weight: 700;
 }
 
@@ -1065,66 +1805,127 @@ button, input {
 }
 
 .btn-add {
+    flex: 0 0 auto;
+
     min-height: 52px;
+
     padding: 0 22px;
+
     border-radius: 14px;
-    border: 1px solid rgba(104, 215, 168, 0.2);
-    background: linear-gradient(135deg, rgba(104, 215, 168, 0.18), rgba(52, 183, 125, 0.12));
+
+    border: 1px solid rgba(104, 215, 168, 0.20);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(104, 215, 168, 0.18),
+            rgba(52, 183, 125, 0.12)
+        );
+
     color: var(--primary-color);
+
     font-weight: 800;
+
     letter-spacing: 0.12em;
+
     text-transform: uppercase;
+
     cursor: pointer;
 }
 
+
+/* =========================================================
+   INSIGHTS
+   ========================================================= */
+
 .insights-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
+
     gap: 14px;
 }
 
 .insight-item {
-    padding: 16px 18px;
-    background: rgba(9, 17, 24, 0.88);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
+    min-width: 0;
+
     min-height: 118px;
+
+    padding: 16px 18px;
+
+    background: rgba(9, 17, 24, 0.88);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 14px;
 }
 
 .insight-label {
     margin-bottom: 10px;
+
     font-size: 0.68rem;
+
     line-height: 1.4;
+
     letter-spacing: 0.12em;
+
     text-transform: uppercase;
+
     color: var(--text-secondary);
+
     font-weight: 700;
 }
 
 .insight-value {
+    max-width: 100%;
+
     font-size: clamp(1rem, 1.8vw, 1.5rem);
+
     line-height: 1.2;
+
     font-weight: 800;
+
     letter-spacing: -0.05em;
+
     color: var(--text-primary);
+
+    overflow-wrap: anywhere;
 }
 
 .insight-date {
     margin-top: 8px;
+
     color: var(--text-secondary);
+
     font-size: 0.72rem;
 }
 
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
 .modal {
     display: none;
+
     position: fixed;
+
     inset: 0;
+
     z-index: 1000;
-    background: rgba(2, 5, 8, 0.7);
-    backdrop-filter: blur(8px);
+
+    padding: 20px;
+
     align-items: center;
     justify-content: center;
-    padding: 20px;
+
+    background: rgba(2, 5, 8, 0.70);
+
+    backdrop-filter: blur(8px);
 }
 
 .modal.active {
@@ -1133,43 +1934,66 @@ button, input {
 
 .modal-content {
     width: min(100%, 500px);
-    background: linear-gradient(180deg, rgba(18, 30, 45, 0.98), rgba(12, 20, 28, 0.98));
-    border: 1px solid var(--border-color);
-    border-radius: 22px;
-    box-shadow: var(--shadow-soft);
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
     padding: 24px 22px 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(18, 30, 45, 0.98),
+            rgba(12, 20, 28, 0.98)
+        );
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 22px;
+
+    box-shadow: var(--shadow-soft);
 }
 
 .modal-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 12px;
+
     margin-bottom: 18px;
+
     font-size: 1.2rem;
+
     font-weight: 800;
+
     color: var(--text-primary);
 }
 
 .btn-close {
     width: 34px;
     height: 34px;
-    border: none;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text-secondary);
-    font-size: 1.4rem;
-    cursor: pointer;
-}
 
-.btn-close:hover {
-    background: rgba(104, 215, 168, 0.08);
-    color: var(--primary-color);
+    border: none;
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    color: var(--text-secondary);
+
+    font-size: 1.4rem;
+
+    cursor: pointer;
 }
 
 .modal-form {
     display: flex;
+
     flex-direction: column;
+
     gap: 16px;
 }
 
@@ -1177,570 +2001,459 @@ button, input {
     margin: 0;
 }
 
-.modal-form label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-secondary);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
 .modal-form input,
 .modal-form select {
     width: 100%;
-    min-height: 48px;
-    padding: 0 14px;
-    background: rgba(9, 17, 24, 0.9);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    outline: none;
-}
 
-.modal-form input:focus,
-.modal-form select:focus {
-    border-color: rgba(104, 215, 168, 0.4);
-    box-shadow: 0 0 0 4px rgba(104, 215, 168, 0.08);
+    min-height: 48px;
+
+    padding: 0 14px;
+
+    background: rgba(9, 17, 24, 0.90);
+
+    color: var(--text-primary);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 12px;
 }
 
 .modal-buttons {
     display: flex;
+
     gap: 10px;
+
     margin-top: 12px;
 }
 
 .btn-modal {
     flex: 1;
+
     min-height: 46px;
+
     border-radius: 12px;
+
     font-size: 0.72rem;
-    letter-spacing: 0.1em;
+
+    letter-spacing: 0.10em;
+
     text-transform: uppercase;
+
     font-weight: 800;
+
     cursor: pointer;
 }
 
 .btn-modal-primary {
-    border: 1px solid rgba(104, 215, 168, 0.2);
-    background: linear-gradient(135deg, rgba(104, 215, 168, 0.14), rgba(52, 183, 125, 0.14));
+    border: 1px solid rgba(104, 215, 168, 0.20);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(104, 215, 168, 0.14),
+            rgba(52, 183, 125, 0.14)
+        );
+
     color: var(--primary-color);
 }
 
 .btn-modal-secondary {
-    border: 1px solid rgba(154, 170, 183, 0.2);
+    border: 1px solid rgba(154, 170, 183, 0.20);
+
     background: rgba(255, 255, 255, 0.02);
+
     color: var(--text-primary);
 }
 
-@media (max-width: 1199px) {
-    .sidebar {
-        width: 240px;
-    }
-}
-
-@media (max-width: 991px) {
-    .container {
-        display: block;
-    }
-
-    .mobile-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        position: sticky;
-        top: 0;
-        z-index: 30;
-        width: 100%;
-        padding: 12px 16px;
-        background: rgba(11, 18, 26, 0.94);
-        border-bottom: 1px solid var(--border-color);
-        backdrop-filter: blur(18px);
-    }
-
-    .mobile-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
-    }
-
-    .mobile-clock {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        justify-content: center;
-        gap: 2px;
-        padding: 8px 12px;
-        min-width: 126px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: var(--text-primary);
-        flex-shrink: 0;
-    }
-
-    .mobile-clock-time {
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        white-space: nowrap;
-    }
-
-    .mobile-clock-countdown {
-        font-size: 0.68rem;
-        color: var(--text-muted);
-        line-height: 1.2;
-    }
-
-    .mobile-header .brand-mark {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        font-size: 0.72rem;
-    }
-
-    .mobile-brand span {
-        font-size: 0.9rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        color: var(--text-primary);
-    }
-
-    .mobile-profile {
-        flex-shrink: 0;
-        min-height: 36px;
-        padding: 0 12px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 999px;
-        border: 1px solid var(--border-color);
-        background: rgba(255, 255, 255, 0.02);
-        color: var(--text-primary);
-        font-size: 0.72rem;
-        font-weight: 700;
-    }
-
-    .sidebar {
-        display: none;
-    }
-
-    @media (max-width: 580px) {
-        .mobile-clock {
-            min-width: 0;
-            flex: 1;
-            align-items: flex-start;
-        }
-
-        .mobile-clock-countdown {
-            display: none;
-        }
-    }
-
-    .content-header {
-        padding: 18px 16px;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .content-area {
-        padding: 16px;
-    }
-
-    .journal-header,
-    .calendar-container,
-    .transaction-container,
-    .quick-action-container,
-    .insights-container {
-        padding: 16px;
-    }
-}
-
-@media (max-width: 767px) {
-    .content-header {
-        align-items: flex-start;
-        gap: 12px;
-        flex-direction: column;
-        padding: 16px;
-    }
-
-    .quick-action-input {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .btn-add {
-        width: 100%;
-    }
-
-    .calendar-day {
-        min-height: 84px;
-    }
-
-    .calendar-day-date {
-        font-size: 0.72rem;
-    }
-
-    .calendar-day-amount {
-        font-size: 0.65rem;
-    }
-
-    .calendar-day-status {
-        letter-spacing: 0.08em;
-    }
-}
-
-@media (max-width: 599px) {
-    .login-box {
-        padding: 22px 18px 20px;
-    }
-
-    .content-area {
-        padding: 14px;
-    }
-
-    .stats-grid,
-    .insights-grid,
-    .quick-action-buttons {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .calendar-weekdays,
-    .calendar-days {
-        gap: 6px;
-    }
-
-    .calendar-day {
-        min-height: 72px;
-        padding: 6px 4px;
-        border-radius: 10px;
-    }
-
-    .calendar-day-amount {
-        font-size: 0.58rem;
-    }
-
-    .calendar-day-status {
-        font-size: 0.47rem;
-        letter-spacing: 0.07em;
-    }
-
-    .transaction-item {
-        padding: 12px;
-    }
-}
-
-@media (max-width: 479px) {
-    .content-header h1 {
-        font-size: 1.35rem;
-    }
-
-    .mobile-brand span {
-        font-size: 0.82rem;
-    }
-
-    .stats-grid,
-    .insights-grid,
-    .quick-action-buttons {
-        grid-template-columns: 1fr;
-    }
-
-    .calendar-month {
-        min-width: 120px;
-    }
-
-    .weekday {
-        font-size: 0.56rem;
-        letter-spacing: 0.08em;
-    }
-
-    .calendar-day-date {
-        font-size: 0.68rem;
-    }
-
-    .calendar-day-amount {
-        font-size: 0.56rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
-    }
-}
-
-::-webkit-scrollbar {
-    width: 9px;
-    height: 9px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(9, 17, 24, 0.8);
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(104, 215, 168, 0.35);
-    border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(104, 215, 168, 0.5);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.page.active {
-    animation: fadeIn 0.24s ease-out;
-}        
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .loading {
-            animation: pulse 1.5s ease-in-out infinite;
-        }
 
 /* =========================================================
-   PROFIT JOURNAL — RESPONSIVE / MOBILE FIXES
+   FOCUS
    ========================================================= */
 
-html {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-}
-
-button,
-input,
-select {
-    -webkit-tap-highlight-color: transparent;
-}
-
-button {
-    touch-action: manipulation;
-}
-
-.content-area {
-    scrollbar-gutter: stable;
-}
-
-/* Keep the calendar readable without creating page overflow */
-.calendar-container {
-    min-width: 0;
-    overflow: hidden;
-}
-
-.calendar-weekdays,
-.calendar-days {
-    width: 100%;
-    min-width: 0;
-}
-
-.calendar-day {
-    min-width: 0;
-    overflow: hidden;
-}
-
-.calendar-day-date,
-.calendar-day-amount,
-.calendar-day-status {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.calendar-day-amount {
-    font-variant-numeric: tabular-nums;
-}
-
-/* Selected/today states remain visible even on small screens */
-.calendar-day.today {
-    outline: 1px solid rgba(104, 215, 168, 0.18);
-    outline-offset: -2px;
-}
-
-/* Date detail statistics */
-.date-transaction-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 18px;
-}
-
-.date-transaction-stats > * {
-    min-width: 0;
-}
-
-/* Better focus visibility */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
     outline: 2px solid rgba(104, 215, 168, 0.55);
+
     outline-offset: 2px;
 }
 
-/* Prevent long journal names / usernames from breaking layouts */
-.journal-card h3,
-.journal-card p,
-#currentUsername {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
 
 /* =========================================================
    TABLET
    ========================================================= */
 
-@media (max-width: 991px) {
-    .content-header {
-        min-width: 0;
+@media (max-width: 1199px) {
+
+    .sidebar {
+        width: 240px;
+        flex-basis: 240px;
     }
 
-    #headerActions {
-        width: 100%;
-        justify-content: flex-end;
+    .content-area {
+        padding: 24px;
     }
 
-    .content-header h1 {
-        min-width: 0;
-    }
-
-    .journals-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .insights-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
+
 /* =========================================================
-   MOBILE
+   TABLET / MOBILE BREAKPOINT
    ========================================================= */
 
-@media (max-width: 767px) {
-    .content-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+@media (max-width: 991px) {
+
+    /* Remove desktop sidebar */
+    .sidebar {
+        display: none;
     }
 
-    #headerActions {
+    /* Mobile top header */
+    .mobile-header {
+        display: flex;
+
+        align-items: center;
+
         width: 100%;
-        justify-content: space-between;
+
+        min-height: 62px;
+
+        padding:
+            10px
+            14px;
+
+        gap: 10px;
+
+        position: sticky;
+
+        top: 0;
+
+        z-index: 50;
+
+        background:
+            rgba(8, 15, 22, 0.96);
+
+        border-bottom:
+            1px solid var(--border-color);
+
+        backdrop-filter: blur(18px);
+    }
+
+    .mobile-brand {
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        min-width: 0;
+
+        flex: 0 1 auto;
+    }
+
+    .mobile-header .brand-mark {
+        width: 34px;
+        height: 34px;
+
+        flex: 0 0 34px;
+
+        border-radius: 10px;
+
+        font-size: 0.70rem;
+    }
+
+    .mobile-brand span {
+        min-width: 0;
+
+        color: var(--text-primary);
+
+        font-size: 0.84rem;
+
+        font-weight: 800;
+
+        letter-spacing: -0.03em;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+    .mobile-clock {
+        min-width: 0;
+
+        flex: 1 1 auto;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 2px;
+
+        padding: 7px 8px;
+
+        border-radius: 12px;
+
+        background: rgba(255, 255, 255, 0.04);
+
+        border:
+            1px solid
+            rgba(255, 255, 255, 0.08);
+
+        overflow: hidden;
+    }
+
+    .mobile-clock-time {
+        max-width: 100%;
+
+        color: var(--primary-color);
+
+        font-size: 0.72rem;
+
+        font-weight: 800;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+    .mobile-clock-countdown {
+        max-width: 100%;
+
+        color: var(--text-muted);
+
+        font-size: 0.58rem;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+    .mobile-profile {
+        flex: 0 0 auto;
+
+        min-height: 34px;
+
+        padding: 0 10px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 999px;
+
+        border:
+            1px solid
+            var(--border-color);
+
+        background:
+            rgba(255, 255, 255, 0.02);
+
+        color: var(--text-primary);
+
+        font-size: 0.66rem;
+
+        font-weight: 700;
+
+        cursor: pointer;
+    }
+
+    /* Main content must remain visible */
+    #appContainer {
+        min-height: 100vh;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-content {
+        width: 100%;
+
+        min-width: 0;
+
+        min-height: calc(100vh - 62px);
+    }
+
+    .content-header {
+        width: 100%;
+
+        padding: 14px 16px;
+
+        gap: 12px;
+
         flex-wrap: wrap;
     }
 
-    .header-clock {
+    .content-header h1 {
+        flex: 1 1 100%;
+
         min-width: 0;
-        flex: 1 1 180px;
+
+        font-size: 1.35rem;
     }
 
-    .journals-grid {
-        grid-template-columns: 1fr;
-    }
+    #headerActions {
+        width: 100%;
 
-    .stats-grid,
-    .insights-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+        display: flex;
 
-    .date-transaction-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .calendar-header {
         align-items: center;
+
+        justify-content: space-between;
+
+        flex-wrap: wrap;
+
+        gap: 8px;
     }
 
-    .calendar-nav {
-        flex-shrink: 0;
+    .currency-control {
+        flex: 0 0 auto;
     }
 
-    .calendar-month {
+    .header-clock {
+        flex: 1 1 180px;
+
         min-width: 0;
-        flex: 1;
+
+        align-items: flex-end;
     }
 
-    .calendar-weekdays,
-    .calendar-days {
-        gap: 5px;
+    .content-area {
+        width: 100%;
+
+        min-width: 0;
+
+        padding: 16px;
+
+        overflow-x: hidden;
     }
 
-    .calendar-day {
-        min-height: 78px;
-        padding: 7px 3px;
-        border-radius: 11px;
+    .page {
+        width: 100%;
+
+        min-width: 0;
     }
 
-    .calendar-day-date {
-        align-self: center;
-        font-size: 0.7rem;
-        margin-bottom: 6px;
+    /* Dashboard */
+    .journals-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
     }
 
-    .calendar-day-amount {
-        font-size: clamp(0.53rem, 2.1vw, 0.7rem);
-        letter-spacing: -0.03em;
+    /* Stats */
+    .stats-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
     }
 
-    .calendar-day-status {
-        font-size: 0.46rem;
-        letter-spacing: 0.055em;
+    .insights-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
     }
 
-    .quick-action-buttons {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .btn-action {
-        min-height: 54px;
-    }
-
-    .transaction-item {
-        align-items: flex-start;
-    }
 }
 
+
 /* =========================================================
-   SMALL PHONES
+   PHONE
    ========================================================= */
 
-@media (max-width: 479px) {
+@media (max-width: 767px) {
+
+    .content-header {
+        padding: 12px;
+
+        gap: 10px;
+    }
+
+    .content-header h1 {
+        font-size: 1.20rem;
+    }
+
+    #headerActions {
+        align-items: stretch;
+    }
+
+    .currency-control {
+        min-height: 40px;
+
+        padding: 5px 8px;
+    }
+
+    .currency-label {
+        display: none;
+    }
+
+    .currency-select {
+        min-height: 30px;
+
+        font-size: 0.70rem;
+    }
+
+    .header-clock {
+        min-height: 40px;
+
+        padding: 6px 9px;
+    }
+
+    .clock-time {
+        font-size: 0.70rem;
+    }
+
+    .clock-date {
+        font-size: 0.58rem;
+    }
+
+    .clock-countdown {
+        font-size: 0.54rem;
+    }
+
     .content-area {
         padding: 12px;
     }
 
-    .content-header {
-        padding: 14px 12px;
+    .dashboard-header {
+        margin-bottom: 12px;
     }
 
-    .header-clock {
+    .btn-create-journal {
         width: 100%;
-        align-items: flex-start;
-        text-align: left;
+
+        min-height: 44px;
+
+        font-size: 0.70rem;
     }
 
-    #headerActions {
-        gap: 8px;
+    .journals-grid {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+    .journal-card {
+        min-height: 190px;
+
+        padding: 18px 15px;
     }
 
     .journal-header,
@@ -1748,55 +2461,116 @@ select:focus-visible {
     .transaction-container,
     .quick-action-container,
     .insights-container {
+        width: 100%;
+
         padding: 14px;
+
+        margin-bottom: 14px;
+
         border-radius: 16px;
     }
 
-    .stats-grid,
-    .insights-grid {
-        grid-template-columns: 1fr 1fr;
+    .journal-title {
+        margin-bottom: 14px;
+
+        font-size: 1.35rem;
+    }
+
+    /* Stats stay 2 columns */
+    .stats-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
         gap: 8px;
     }
 
-    .stat-box,
-    .insight-item {
-        padding: 12px;
-        min-height: 92px;
+    .stat-box {
+        min-height: 88px;
+
+        padding: 11px;
     }
 
-    .stat-label,
-    .insight-label {
-        font-size: 0.57rem;
-        letter-spacing: 0.07em;
+    .stat-box::before {
+        left: 11px;
+        top: 11px;
+
+        width: 28px;
+    }
+
+    .stat-label {
+        margin-top: 16px;
+        margin-bottom: 7px;
+
+        font-size: 0.53rem;
+
+        letter-spacing: 0.06em;
+
+        line-height: 1.3;
     }
 
     .stat-value {
-        font-size: 1rem;
+        font-size: 0.92rem;
+
+        letter-spacing: -0.04em;
     }
 
-    .insight-value {
-        font-size: 0.95rem;
+    .progress-section {
+        margin-top: 12px;
+
+        padding-top: 12px;
     }
 
+    .progress-label {
+        font-size: 0.58rem;
+    }
+
+    .progress-bar-large {
+        height: 8px;
+    }
+
+    /* Calendar */
     .calendar-header {
+        align-items: center;
+
+        margin-bottom: 10px;
+
         gap: 6px;
     }
 
     .calendar-header h2 {
-        font-size: 0.86rem;
+        margin-bottom: 0;
+
+        font-size: 0.78rem;
     }
 
     .calendar-nav {
-        gap: 5px;
-    }
+        gap: 4px;
 
-    .btn-nav {
-        width: 34px;
-        height: 34px;
+        flex: 1;
+
+        justify-content: flex-end;
     }
 
     .calendar-month {
-        font-size: 0.82rem;
+        min-width: 0;
+
+        font-size: 0.76rem;
+
+        max-width: 105px;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+    .btn-nav {
+        width: 32px;
+        height: 32px;
+
+        flex-basis: 32px;
     }
 
     .calendar-weekdays,
@@ -1805,62 +2579,457 @@ select:focus-visible {
     }
 
     .weekday {
-        min-height: 28px;
-        font-size: 0.48rem;
-        letter-spacing: 0.04em;
+        min-height: 25px;
+
+        font-size: 0.43rem;
+
+        letter-spacing: 0.02em;
     }
 
     .calendar-day {
         min-height: 68px;
+
         padding: 5px 2px;
+
         border-radius: 8px;
     }
 
     .calendar-day-date {
-        font-size: 0.62rem;
+        align-self: center;
+
         margin-bottom: 5px;
+
+        font-size: 0.61rem;
     }
 
     .calendar-day-amount {
-        font-size: 0.5rem;
-        max-width: 100%;
+        width: 100%;
+
+        font-size: 0.48rem;
+
+        letter-spacing: -0.04em;
     }
 
     .calendar-day-status {
-        font-size: 0.4rem;
-        letter-spacing: 0.035em;
+        width: 100%;
+
+        font-size: 0.36rem;
+
+        letter-spacing: 0.02em;
     }
 
+    /* Date transaction stats */
+    #dateTransactionStats,
+    .date-transaction-stats {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+
+        gap: 6px;
+    }
+
+    /* Quick actions */
     .quick-action-buttons {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
         gap: 8px;
     }
 
     .btn-action {
         min-height: 50px;
-        font-size: 0.68rem;
-        letter-spacing: 0.07em;
+
+        font-size: 0.66rem;
+
+        letter-spacing: 0.06em;
     }
 
     .quick-action-input {
+        flex-direction: column;
+
+        align-items: stretch;
+
         gap: 8px;
     }
 
-    .input-group,
-    .btn-add {
+    .input-group {
+        width: 100%;
+
         min-height: 50px;
     }
 
+    .btn-add {
+        width: 100%;
+
+        min-height: 50px;
+
+        padding: 0 14px;
+    }
+
+    /* Transactions */
+    .transaction-item {
+        padding: 11px;
+
+        gap: 10px;
+
+        align-items: flex-start;
+    }
+
+    .transaction-type {
+        font-size: 0.78rem;
+    }
+
+    .transaction-time {
+        font-size: 0.62rem;
+    }
+
+    .transaction-amount {
+        font-size: 0.76rem;
+    }
+
+    /* Insights */
+    .insights-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap: 8px;
+    }
+
+    .insight-item {
+        min-height: 88px;
+
+        padding: 11px;
+    }
+
+    .insight-label {
+        font-size: 0.53rem;
+
+        letter-spacing: 0.05em;
+    }
+
+    .insight-value {
+        font-size: 0.85rem;
+    }
+
+    .insight-date {
+        font-size: 0.60rem;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   360px / 375px / 390px
+   ========================================================= */
+
+@media (max-width: 479px) {
+
+    .mobile-header {
+        min-height: 58px;
+
+        padding:
+            9px
+            10px;
+
+        gap: 6px;
+    }
+
+    .mobile-header .brand-mark {
+        width: 30px;
+        height: 30px;
+
+        flex-basis: 30px;
+
+        border-radius: 9px;
+
+        font-size: 0.62rem;
+    }
+
+    .mobile-brand {
+        max-width: 92px;
+
+        gap: 6px;
+    }
+
+    .mobile-brand span {
+        font-size: 0.70rem;
+    }
+
+    .mobile-clock {
+        padding: 5px 6px;
+
+        border-radius: 10px;
+    }
+
+    .mobile-clock-time {
+        font-size: 0.62rem;
+    }
+
+    .mobile-clock-countdown {
+        font-size: 0.48rem;
+    }
+
+    .mobile-profile {
+        min-height: 30px;
+
+        padding: 0 8px;
+
+        font-size: 0.58rem;
+    }
+
+    .main-content {
+        min-height: calc(100vh - 58px);
+    }
+
+    .content-header {
+        padding: 10px;
+
+        gap: 8px;
+    }
+
+    .content-header h1 {
+        font-size: 1.05rem;
+    }
+
+    #headerActions {
+        gap: 6px;
+    }
+
+    .currency-control {
+        padding: 4px 6px;
+
+        border-radius: 10px;
+    }
+
+    .currency-select {
+        min-height: 28px;
+
+        padding-left: 6px;
+        padding-right: 20px;
+
+        font-size: 0.62rem;
+    }
+
+    .header-clock {
+        padding: 5px 7px;
+
+        border-radius: 10px;
+    }
+
+    .clock-time {
+        font-size: 0.60rem;
+    }
+
+    .clock-date {
+        display: none;
+    }
+
+    .clock-countdown {
+        font-size: 0.48rem;
+    }
+
+    .content-area {
+        padding: 9px;
+    }
+
+    .journal-header,
+    .calendar-container,
+    .transaction-container,
+    .quick-action-container,
+    .insights-container {
+        padding: 11px;
+
+        border-radius: 13px;
+
+        margin-bottom: 10px;
+    }
+
+    .journal-title {
+        font-size: 1.15rem;
+
+        margin-bottom: 11px;
+    }
+
+    /* Stats */
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-box {
+        min-height: 78px;
+
+        padding: 9px;
+    }
+
+    .stat-box::before {
+        left: 9px;
+        top: 9px;
+
+        width: 24px;
+    }
+
+    .stat-label {
+        margin-top: 14px;
+
+        font-size: 0.46rem;
+
+        line-height: 1.2;
+    }
+
+    .stat-value {
+        font-size: 0.78rem;
+    }
+
+    /* Calendar */
+    .calendar-header h2 {
+        font-size: 0.70rem;
+    }
+
+    .calendar-month {
+        max-width: 95px;
+
+        font-size: 0.68rem;
+    }
+
+    .btn-nav {
+        width: 29px;
+        height: 29px;
+
+        flex-basis: 29px;
+
+        font-size: 0.80rem;
+    }
+
+    .calendar-weekdays,
+    .calendar-days {
+        gap: 2px;
+    }
+
+    .weekday {
+        min-height: 22px;
+
+        font-size: 0.37rem;
+    }
+
+    .calendar-day {
+        min-height: 61px;
+
+        padding: 4px 1px;
+
+        border-radius: 7px;
+    }
+
+    .calendar-day-date {
+        font-size: 0.54rem;
+
+        margin-bottom: 4px;
+    }
+
+    .calendar-day-amount {
+        font-size: 0.41rem;
+    }
+
+    .calendar-day-status {
+        font-size: 0.31rem;
+    }
+
+    /* Date stats */
+    #dateTransactionStats,
+    .date-transaction-stats {
+        gap: 4px;
+    }
+
+    #dateTransactionStats .stat-box,
+    .date-transaction-stats .stat-box {
+        min-height: 68px;
+
+        padding: 7px;
+    }
+
+    /* Quick action */
+    .quick-action-buttons {
+        gap: 6px;
+    }
+
+    .btn-action {
+        min-height: 46px;
+
+        font-size: 0.58rem;
+    }
+
+    .input-group {
+        min-height: 46px;
+
+        padding: 0 10px;
+    }
+
+    .input-group label {
+        font-size: 0.68rem;
+    }
+
+    .input-group input {
+        font-size: 0.84rem;
+    }
+
+    .btn-add {
+        min-height: 46px;
+
+        font-size: 0.60rem;
+
+        letter-spacing: 0.06em;
+    }
+
+    /* Insights */
+    .insights-grid {
+        gap: 6px;
+    }
+
+    .insight-item {
+        min-height: 76px;
+
+        padding: 9px;
+    }
+
+    .insight-label {
+        font-size: 0.45rem;
+    }
+
+    .insight-value {
+        font-size: 0.74rem;
+    }
+
+    .insight-date {
+        font-size: 0.52rem;
+    }
+
+    /* Modal */
     .modal {
-        padding: 12px;
+        padding: 8px;
+
         align-items: flex-end;
     }
 
     .modal-content {
         width: 100%;
+
         max-height: 92vh;
-        overflow-y: auto;
-        border-radius: 20px 20px 14px 14px;
-        padding: 20px 16px 16px;
+
+        padding: 17px 13px 13px;
+
+        border-radius:
+            17px
+            17px
+            10px
+            10px;
     }
 
     .modal-buttons {
@@ -1869,63 +3038,74 @@ select:focus-visible {
 
     .btn-modal {
         width: 100%;
+
+        min-height: 44px;
     }
+
 }
 
+
 /* =========================================================
-   VERY SMALL PHONES
+   VERY SMALL PHONE
    ========================================================= */
 
 @media (max-width: 359px) {
-    .content-area {
-        padding: 10px;
+
+    .mobile-brand {
+        max-width: 78px;
     }
 
-    .calendar-weekdays,
-    .calendar-days {
-        gap: 2px;
+    .mobile-brand span {
+        font-size: 0.64rem;
+    }
+
+    .mobile-clock-time {
+        font-size: 0.56rem;
+    }
+
+    .mobile-clock-countdown {
+        display: none;
+    }
+
+    .mobile-profile {
+        padding: 0 6px;
+
+        font-size: 0.52rem;
+    }
+
+    .content-area {
+        padding: 7px;
     }
 
     .calendar-day {
-        min-height: 62px;
-        padding: 4px 1px;
+        min-height: 57px;
     }
 
     .calendar-day-date {
-        font-size: 0.58rem;
+        font-size: 0.50rem;
     }
 
     .calendar-day-amount {
-        font-size: 0.45rem;
+        font-size: 0.38rem;
     }
 
     .calendar-day-status {
-        font-size: 0.35rem;
+        font-size: 0.28rem;
     }
 
-    .stats-grid,
-    .insights-grid {
-        gap: 6px;
-    }
-
-    .stat-box,
-    .insight-item {
-        padding: 10px 8px;
-    }
 }
+
 
 /* =========================================================
    TOUCH DEVICES
    ========================================================= */
 
 @media (hover: none) and (pointer: coarse) {
+
     .calendar-day:hover,
     .journal-card:hover,
     .nav-item:hover,
-    .btn-nav:hover,
-    .btn-small:hover,
-    .btn-add:hover,
-    .btn-logout:hover {
+    .btn-nav:hover {
         transform: none;
     }
 
@@ -1937,7 +3117,96 @@ select:focus-visible {
     .btn-modal,
     .btn-login,
     .btn-create-journal,
-    .btn-logout {
-        min-height: 44px;
+    .btn-logout,
+    .mobile-profile {
+        touch-action: manipulation;
     }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+
+        transition: none !important;
+
+        scroll-behavior: auto !important;
+    }
+
+}
+
+
+/* =========================================================
+   SCROLLBARS
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(9, 17, 24, 0.80);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(104, 215, 168, 0.35);
+
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(104, 215, 168, 0.50);
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+}
+
+.loading {
+    animation:
+        pulse
+        1.5s
+        ease-in-out
+        infinite;
 }
