@@ -1,289 +1,1101 @@
 // ============================================================================
+// PROFIT JOURNAL - COMPLETE SCRIPT
+// Currency: INR / USD
+// Base storage currency: INR
+// Timezone: Asia/Kolkata
+// ============================================================================
+
+
+// ============================================================================
+// 🔴 CHANGEABLE SETTINGS - CHANGE ONLY THESE
+// ============================================================================
+
+// Your Google Apps Script Web App URL
+const appScriptUrl =
+    'https://script.google.com/macros/s/AKfycbxr6k2jquWNrlHP5uuwbbhQrugjvs3qXCW4x5hsH6LYbJBjBgkyVCHc6bTrY6sWlXJPeg/exec';
+
+
+// 1 USD = ₹95.69
+// Change this number manually whenever the exchange rate changes.
+const USD_TO_INR = 95.69;
+
+
+// ============================================================================
 // APPLICATION STATE
 // ============================================================================
 
 const APP_STATE = {
+
     currentUser: null,
+
     currentJournal: null,
+
     allTransactions: [],
+
     selectedDate: null,
+
     selectedTransactionType: null,
+
     currentMonth: new Date(),
-    appScriptUrl: 'https://script.google.com/macros/s/AKfycbxr6k2jquWNrlHP5uuwbbhQrugjvs3qXCW4x5hsH6LYbJBjBgkyVCHc6bTrY6sWlXJPeg/exec'
+
+    // Google Sheet / backend always stores INR
+    baseCurrency: 'INR',
+
+    // User selected currency
+    currency:
+        localStorage.getItem(
+            'profitJournalCurrency'
+        ) || 'INR'
+
 };
+
+
+// ============================================================================
+// CURRENCY CONFIGURATION
+// ============================================================================
+
+const CURRENCY_CONFIG = {
+
+    INR: {
+        code: 'INR',
+        symbol: '₹',
+        locale: 'en-IN',
+        decimals: 2
+    },
+
+    USD: {
+        code: 'USD',
+        symbol: '$',
+        locale: 'en-US',
+        decimals: 2
+    }
+
+};
+
+
+// ============================================================================
+// CURRENCY HELPERS
+// ============================================================================
+
+function getCurrencyConfig() {
+
+    return (
+        CURRENCY_CONFIG[
+            APP_STATE.currency
+        ] ||
+        CURRENCY_CONFIG.INR
+    );
+
+}
+
+
+function getCurrencySymbol() {
+
+    return getCurrencyConfig().symbol;
+
+}
+
+
+// ============================================================================
+// INR → SELECTED CURRENCY
+// ============================================================================
+
+function convertFromINR(amount) {
+
+    const numericAmount =
+        parseFloat(amount) || 0;
+
+
+    if (
+        APP_STATE.currency === 'USD'
+    ) {
+
+        return (
+            numericAmount /
+            USD_TO_INR
+        );
+
+    }
+
+
+    return numericAmount;
+
+}
+
+
+// ============================================================================
+// SELECTED CURRENCY → INR
+// ============================================================================
+
+function convertToINR(amount) {
+
+    const numericAmount =
+        parseFloat(amount) || 0;
+
+
+    if (
+        APP_STATE.currency === 'USD'
+    ) {
+
+        return (
+            numericAmount *
+            USD_TO_INR
+        );
+
+    }
+
+
+    return numericAmount;
+
+}
+
+
+// ============================================================================
+// FORMAT MONEY
+// ============================================================================
+
+function formatMoney(
+    amount,
+    options = {}
+) {
+
+    const converted =
+        convertFromINR(amount);
+
+
+    const config =
+        getCurrencyConfig();
+
+
+    const showSign =
+        options.showSign === true;
+
+
+    let sign = '';
+
+
+    if (showSign) {
+
+        if (converted > 0) {
+
+            sign = '+';
+
+        }
+
+        else if (converted < 0) {
+
+            sign = '-';
+
+        }
+
+    }
+
+
+    return (
+
+        sign +
+
+        config.symbol +
+
+        Math.abs(
+            converted
+        ).toLocaleString(
+            config.locale,
+            {
+                minimumFractionDigits:
+                    config.decimals,
+
+                maximumFractionDigits:
+                    config.decimals
+            }
+        )
+
+    );
+
+}
+
+
+// ============================================================================
+// COMPACT MONEY
+// ============================================================================
+
+function formatCompactMoney(
+    amount
+) {
+
+    const converted =
+        Math.abs(
+            convertFromINR(
+                amount
+            )
+        );
+
+
+    const config =
+        getCurrencyConfig();
+
+
+    let value =
+        converted;
+
+
+    let suffix = '';
+
+
+    if (
+        converted >= 1000000000
+    ) {
+
+        value =
+            converted /
+            1000000000;
+
+        suffix = 'B';
+
+    }
+
+    else if (
+        converted >= 1000000
+    ) {
+
+        value =
+            converted /
+            1000000;
+
+        suffix = 'M';
+
+    }
+
+    else if (
+        converted >= 1000
+    ) {
+
+        value =
+            converted /
+            1000;
+
+        suffix = 'K';
+
+    }
+
+
+    return (
+
+        config.symbol +
+
+        value.toLocaleString(
+            config.locale,
+            {
+                minimumFractionDigits:
+                    suffix ? 1 : 2,
+
+                maximumFractionDigits:
+                    suffix ? 1 : 2
+            }
+        ) +
+
+        suffix
+
+    );
+
+}
+
+
+// ============================================================================
+// CURRENCY SELECTOR
+// ============================================================================
+
+function setupCurrencySelector() {
+
+    const selectors =
+        document.querySelectorAll(
+            '.currency-select'
+        );
+
+
+    selectors.forEach(
+        select => {
+
+            select.value =
+                APP_STATE.currency;
+
+
+            select.addEventListener(
+                'change',
+                function () {
+
+                    setCurrency(
+                        this.value
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+// ============================================================================
+// CHANGE CURRENCY
+// ============================================================================
+
+function setCurrency(
+    currency
+) {
+
+    if (
+        !CURRENCY_CONFIG[currency]
+    ) {
+
+        currency = 'INR';
+
+    }
+
+
+    APP_STATE.currency =
+        currency;
+
+
+    localStorage.setItem(
+        'profitJournalCurrency',
+        currency
+    );
+
+
+    updateCurrencyUI();
+
+
+    // Re-render all money values
+
+    if (
+        APP_STATE.currentJournal
+    ) {
+
+        updateJournalHeader();
+
+        renderCalendar();
+
+        updateRecentTransactions();
+
+
+        if (
+            APP_STATE.selectedDate
+        ) {
+
+            displaySelectedDateFromState();
+
+        }
+
+    }
+
+
+    loadJournals();
+
+}
+
+
+// ============================================================================
+// UPDATE CURRENCY UI
+// ============================================================================
+
+function updateCurrencyUI() {
+
+    const selectors =
+        document.querySelectorAll(
+            '.currency-select'
+        );
+
+
+    selectors.forEach(
+        select => {
+
+            select.value =
+                APP_STATE.currency;
+
+        }
+    );
+
+
+    const quickAmount =
+        document.getElementById(
+            'quickAmount'
+        );
+
+
+    if (quickAmount) {
+
+        quickAmount.placeholder =
+            `Enter amount in ${
+                getCurrencySymbol()
+            }`;
+
+    }
+
+
+    const targetAmount =
+        document.getElementById(
+            'targetAmount'
+        );
+
+
+    if (targetAmount) {
+
+        targetAmount.placeholder =
+            `Target in ${
+                getCurrencySymbol()
+            }`;
+
+    }
+
+}
+
 
 // ============================================================================
 // KOLKATA TIMEZONE
 // ============================================================================
 
-const KOLKATA_TIMEZONE = 'Asia/Kolkata';
+const KOLKATA_TIMEZONE =
+    'Asia/Kolkata';
 
-function getKolkataDateParts(date = new Date()) {
-    const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: KOLKATA_TIMEZONE,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-    }).formatToParts(date);
+
+function getKolkataDateParts(
+    date = new Date()
+) {
+
+    const parts =
+        new Intl.DateTimeFormat(
+            'en-US',
+            {
+                timeZone:
+                    KOLKATA_TIMEZONE,
+
+                year:
+                    'numeric',
+
+                month:
+                    '2-digit',
+
+                day:
+                    '2-digit'
+            }
+        ).formatToParts(
+            date
+        );
+
 
     const result = {};
 
-    parts.forEach(({ type, value }) => {
-        if (type !== 'literal') {
-            result[type] = value;
+
+    parts.forEach(
+        ({
+            type,
+            value
+        }) => {
+
+            if (
+                type !== 'literal'
+            ) {
+
+                result[type] =
+                    value;
+
+            }
+
         }
-    });
+    );
+
 
     return result;
+
 }
 
-function getKolkataDateString(date = new Date()) {
-    const parts = getKolkataDateParts(date);
 
-    return `${parts.year}-${parts.month}-${parts.day}`;
+function getKolkataDateString(
+    date = new Date()
+) {
+
+    const parts =
+        getKolkataDateParts(
+            date
+        );
+
+
+    return (
+
+        `${parts.year}-${parts.month}-${parts.day}`
+
+    );
+
 }
+
 
 function getTodayKolkataDateString() {
-    return getKolkataDateString(new Date());
+
+    return getKolkataDateString(
+        new Date()
+    );
+
 }
 
-function isTodayKolkata(dateStr) {
-    return dateStr === getTodayKolkataDateString();
+
+function isTodayKolkata(
+    dateStr
+) {
+
+    return (
+        dateStr ===
+        getTodayKolkataDateString()
+    );
+
 }
+
 
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', function () {
-    setupEventListeners();
-    setDefaultDates();
-    startKolkataClock();
-    scheduleKolkataMidnightRefresh();
-});
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        setupEventListeners();
+
+        setupCurrencySelector();
+
+        setDefaultDates();
+
+        startKolkataClock();
+
+        scheduleKolkataMidnightRefresh();
+
+        updateCurrencyUI();
+
+    }
+);
+
+
+// ============================================================================
+// EVENT LISTENERS
+// ============================================================================
 
 function setupEventListeners() {
 
+    // -----------------------------------------------------
     // Login
-    const loginForm = document.getElementById('loginForm');
+    // -----------------------------------------------------
+
+    const loginForm =
+        document.getElementById(
+            'loginForm'
+        );
+
 
     if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
+
+        loginForm.addEventListener(
+            'submit',
+            handleLogin
+        );
+
     }
 
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', function () {
-            navigateToPage(this.dataset.page);
-        });
-    });
 
+    // -----------------------------------------------------
+    // Navigation
+    // -----------------------------------------------------
+
+    document
+        .querySelectorAll(
+            '.nav-item'
+        )
+        .forEach(
+            item => {
+
+                item.addEventListener(
+                    'click',
+                    function () {
+
+                        navigateToPage(
+                            this.dataset.page
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    // -----------------------------------------------------
     // Logout
-    const logoutBtn = document.getElementById('logoutBtn');
+    // -----------------------------------------------------
+
+    const logoutBtn =
+        document.getElementById(
+            'logoutBtn'
+        );
+
 
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
+
+        logoutBtn.addEventListener(
+            'click',
+            handleLogout
+        );
+
     }
 
+
+    // -----------------------------------------------------
     // Create Journal
-    const createJournalBtn = document.getElementById('createJournalBtn');
+    // -----------------------------------------------------
+
+    const createJournalBtn =
+        document.getElementById(
+            'createJournalBtn'
+        );
+
 
     if (createJournalBtn) {
+
         createJournalBtn.addEventListener(
             'click',
             openCreateJournalModal
         );
+
     }
 
-    const closeCreateModal = document.getElementById('closeCreateModal');
+
+    const closeCreateModal =
+        document.getElementById(
+            'closeCreateModal'
+        );
+
 
     if (closeCreateModal) {
+
         closeCreateModal.addEventListener(
             'click',
             closeCreateJournalModal
         );
+
     }
 
-    const cancelCreateModal = document.getElementById('cancelCreateModal');
+
+    const cancelCreateModal =
+        document.getElementById(
+            'cancelCreateModal'
+        );
+
 
     if (cancelCreateModal) {
+
         cancelCreateModal.addEventListener(
             'click',
             closeCreateJournalModal
         );
+
     }
 
+
     const createJournalForm =
-        document.getElementById('createJournalForm');
+        document.getElementById(
+            'createJournalForm'
+        );
+
 
     if (createJournalForm) {
+
         createJournalForm.addEventListener(
             'submit',
             handleCreateJournal
         );
-    } 
 
-   
-
-   // Calendar navigation
-const prevMonthBtn = document.getElementById('prevMonth');
-
-if (prevMonthBtn) {
-    prevMonthBtn.addEventListener('click', previousMonth);
-}
-
-const nextMonthBtn = document.getElementById('nextMonth');
-
-if (nextMonthBtn) {
-    nextMonthBtn.addEventListener('click', nextMonth);
-}
-    
-    // Quick Action - Profit
-const btnProfit = document.getElementById('btnProfit');
-
-if (btnProfit) {
-    btnProfit.addEventListener('click', function () {
-        selectTransactionType('PROFIT');
-    });
-}
-
-
-    // Quick Action - Loss
-    const btnLoss = document.getElementById('btnLoss');
-
-    if (btnLoss) {
-        btnLoss.addEventListener('click', function () {
-            selectTransactionType('LOSS');
-        });
     }
 
-    // Quick Action - Add Transaction
+
+    // -----------------------------------------------------
+    // Calendar
+    // -----------------------------------------------------
+
+    const prevMonthBtn =
+        document.getElementById(
+            'prevMonth'
+        );
+
+
+    if (prevMonthBtn) {
+
+        prevMonthBtn.addEventListener(
+            'click',
+            previousMonth
+        );
+
+    }
+
+
+    const nextMonthBtn =
+        document.getElementById(
+            'nextMonth'
+        );
+
+
+    if (nextMonthBtn) {
+
+        nextMonthBtn.addEventListener(
+            'click',
+            nextMonth
+        );
+
+    }
+
+
+    // -----------------------------------------------------
+    // Profit
+    // -----------------------------------------------------
+
+    const btnProfit =
+        document.getElementById(
+            'btnProfit'
+        );
+
+
+    if (btnProfit) {
+
+        btnProfit.addEventListener(
+            'click',
+            function () {
+
+                selectTransactionType(
+                    'PROFIT'
+                );
+
+            }
+        );
+
+    }
+
+
+    // -----------------------------------------------------
+    // Loss
+    // -----------------------------------------------------
+
+    const btnLoss =
+        document.getElementById(
+            'btnLoss'
+        );
+
+
+    if (btnLoss) {
+
+        btnLoss.addEventListener(
+            'click',
+            function () {
+
+                selectTransactionType(
+                    'LOSS'
+                );
+
+            }
+        );
+
+    }
+
+
+    // -----------------------------------------------------
+    // Add Transaction
+    // -----------------------------------------------------
+
     const btnAddTransaction =
-        document.getElementById('btnAddTransaction');
+        document.getElementById(
+            'btnAddTransaction'
+        );
+
 
     if (btnAddTransaction) {
+
         btnAddTransaction.addEventListener(
             'click',
             handleAddTransaction
         );
+
     }
 
-    // Modal close when clicking background
+
+    // -----------------------------------------------------
+    // Modal background
+    // -----------------------------------------------------
+
     const createJournalModal =
-        document.getElementById('createJournalModal');
+        document.getElementById(
+            'createJournalModal'
+        );
+
 
     if (createJournalModal) {
-        createJournalModal.addEventListener('click', function (e) {
-            if (e.target === this) {
-                closeCreateJournalModal();
+
+        createJournalModal.addEventListener(
+            'click',
+            function (e) {
+
+                if (
+                    e.target === this
+                ) {
+
+                    closeCreateJournalModal();
+
+                }
+
             }
-        });
+        );
+
     }
+
 }
 
+
 // ============================================================================
-// DEFAULT JOURNAL DATES
+// DEFAULT DATES
 // ============================================================================
 
 function setDefaultDates() {
 
-    const today = getKolkataDateParts();
+    const today =
+        getKolkataDateParts();
+
 
     const startDate =
         `${today.year}-${today.month}-${today.day}`;
 
-    // Default journal duration: 30 days
-    const nextDate = new Date(
-        Date.UTC(
-            Number(today.year),
-            Number(today.month) - 1,
-            Number(today.day) + 30
-        )
-    );
+
+    const nextDate =
+        new Date(
+            Date.UTC(
+                Number(today.year),
+                Number(today.month) - 1,
+                Number(today.day) + 30
+            )
+        );
+
 
     const endDate = [
+
         nextDate.getUTCFullYear(),
-        String(nextDate.getUTCMonth() + 1).padStart(2, '0'),
-        String(nextDate.getUTCDate()).padStart(2, '0')
+
+        String(
+            nextDate.getUTCMonth() + 1
+        ).padStart(
+            2,
+            '0'
+        ),
+
+        String(
+            nextDate.getUTCDate()
+        ).padStart(
+            2,
+            '0'
+        )
+
     ].join('-');
 
-    const startInput = document.getElementById('startDate');
-    const endInput = document.getElementById('endDate');
+
+    const startInput =
+        document.getElementById(
+            'startDate'
+        );
+
+
+    const endInput =
+        document.getElementById(
+            'endDate'
+        );
+
 
     if (startInput) {
-        startInput.value = startDate;
+
+        startInput.value =
+            startDate;
+
     }
+
 
     if (endInput) {
-        endInput.value = endDate;
+
+        endInput.value =
+            endDate;
+
     }
+
 }
 
+
 // ============================================================================
-// KOLKATA DATE/TIME
+// KOLKATA CLOCK
 // ============================================================================
 
 function getKolkataLocalDate() {
 
-    const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: KOLKATA_TIMEZONE,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    }).formatToParts(new Date());
+    const parts =
+        new Intl.DateTimeFormat(
+            'en-US',
+            {
+                timeZone:
+                    KOLKATA_TIMEZONE,
+
+                year:
+                    'numeric',
+
+                month:
+                    '2-digit',
+
+                day:
+                    '2-digit',
+
+                hour:
+                    '2-digit',
+
+                minute:
+                    '2-digit',
+
+                second:
+                    '2-digit',
+
+                hour12:
+                    false
+            }
+        ).formatToParts(
+            new Date()
+        );
+
 
     const dateParts = {};
 
-    parts.forEach(({ type, value }) => {
-        if (type !== 'literal') {
-            dateParts[type] = value;
+
+    parts.forEach(
+        ({
+            type,
+            value
+        }) => {
+
+            if (
+                type !== 'literal'
+            ) {
+
+                dateParts[type] =
+                    value;
+
+            }
+
         }
-    });
+    );
+
 
     return new Date(
         Date.UTC(
-            Number(dateParts.year),
-            Number(dateParts.month) - 1,
-            Number(dateParts.day),
-            Number(dateParts.hour),
-            Number(dateParts.minute),
-            Number(dateParts.second)
+            Number(
+                dateParts.year
+            ),
+
+            Number(
+                dateParts.month
+            ) - 1,
+
+            Number(
+                dateParts.day
+            ),
+
+            Number(
+                dateParts.hour
+            ),
+
+            Number(
+                dateParts.minute
+            ),
+
+            Number(
+                dateParts.second
+            )
         )
     );
+
 }
 
-function formatKolkataCountdown(diffMs) {
+
+function formatKolkataCountdown(
+    diffMs
+) {
 
     const totalSeconds =
-        Math.max(0, Math.floor(diffMs / 1000));
+        Math.max(
+            0,
+            Math.floor(
+                diffMs / 1000
+            )
+        );
+
 
     const hours =
-        String(Math.floor(totalSeconds / 3600))
-            .padStart(2, '0');
+        String(
+            Math.floor(
+                totalSeconds /
+                3600
+            )
+        ).padStart(
+            2,
+            '0'
+        );
+
 
     const minutes =
         String(
-            Math.floor((totalSeconds % 3600) / 60)
-        ).padStart(2, '0');
+            Math.floor(
+                (
+                    totalSeconds %
+                    3600
+                ) / 60
+            )
+        ).padStart(
+            2,
+            '0'
+        );
+
 
     const seconds =
-        String(totalSeconds % 60)
-            .padStart(2, '0');
+        String(
+            totalSeconds %
+            60
+        ).padStart(
+            2,
+            '0'
+        );
 
-    return `${hours}:${minutes}:${seconds}`;
+
+    return (
+        `${hours}:${minutes}:${seconds}`
+    );
+
 }
+
 
 function getKolkataCountdownText() {
 
-    const now = getKolkataLocalDate();
+    const now =
+        getKolkataLocalDate();
 
-    const year = now.getUTCFullYear();
-    const month = now.getUTCMonth();
-    const day = now.getUTCDate();
+
+    const year =
+        now.getUTCFullYear();
+
+
+    const month =
+        now.getUTCMonth();
+
+
+    const day =
+        now.getUTCDate();
+
 
     const nextMidnight =
         new Date(
@@ -297,124 +1109,187 @@ function getKolkataCountdownText() {
             )
         );
 
-    const diff =
-        nextMidnight.getTime() - now.getTime();
 
-    return `Day ends in ${formatKolkataCountdown(diff)}`;
+    const diff =
+        nextMidnight.getTime() -
+        now.getTime();
+
+
+    return (
+        `Day ends in ${
+            formatKolkataCountdown(
+                diff
+            )
+        }`
+    );
+
 }
+
 
 function updateKolkataClock() {
 
-    const now = new Date();
+    const now =
+        new Date();
+
 
     const timeString =
-        new Intl.DateTimeFormat('en-IN', {
-            timeZone: KOLKATA_TIMEZONE,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).format(now);
+        new Intl.DateTimeFormat(
+            'en-IN',
+            {
+                timeZone:
+                    KOLKATA_TIMEZONE,
+
+                hour:
+                    '2-digit',
+
+                minute:
+                    '2-digit',
+
+                second:
+                    '2-digit',
+
+                hour12:
+                    false
+            }
+        ).format(now);
+
 
     const dateString =
-        new Intl.DateTimeFormat('en-IN', {
-            timeZone: KOLKATA_TIMEZONE,
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        }).format(now);
+        new Intl.DateTimeFormat(
+            'en-IN',
+            {
+                timeZone:
+                    KOLKATA_TIMEZONE,
+
+                weekday:
+                    'short',
+
+                day:
+                    'numeric',
+
+                month:
+                    'short',
+
+                year:
+                    'numeric'
+            }
+        ).format(now);
+
 
     const desktopTimeEl =
-        document.getElementById('kolkataClockTime');
+        document.getElementById(
+            'kolkataClockTime'
+        );
+
 
     const desktopDateEl =
-        document.getElementById('kolkataClockDate');
+        document.getElementById(
+            'kolkataClockDate'
+        );
+
 
     const desktopCountdownEl =
         document.getElementById(
             'kolkataClockCountdown'
         );
 
+
     const mobileTimeEl =
         document.getElementById(
             'kolkataClockTimeMobile'
         );
+
 
     const mobileCountdownEl =
         document.getElementById(
             'kolkataClockCountdownMobile'
         );
 
+
     if (desktopTimeEl) {
+
         desktopTimeEl.textContent =
             `Kolkata • ${timeString}`;
+
     }
+
 
     if (desktopDateEl) {
+
         desktopDateEl.textContent =
             dateString;
+
     }
+
 
     if (desktopCountdownEl) {
+
         desktopCountdownEl.textContent =
             getKolkataCountdownText();
+
     }
+
 
     if (mobileTimeEl) {
+
         mobileTimeEl.textContent =
             `Kolkata • ${timeString}`;
+
     }
 
+
     if (mobileCountdownEl) {
+
         mobileCountdownEl.textContent =
             getKolkataCountdownText();
+
     }
+
 }
+
 
 function startKolkataClock() {
 
     updateKolkataClock();
 
+
     setInterval(
         updateKolkataClock,
         1000
     );
+
 }
+
 
 function getNextKolkataMidnight() {
 
     const now =
         getKolkataLocalDate();
 
-    const year =
-        now.getUTCFullYear();
-
-    const month =
-        now.getUTCMonth();
-
-    const day =
-        now.getUTCDate();
 
     return new Date(
         Date.UTC(
-            year,
-            month,
-            day + 1,
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() + 1,
             0,
             0,
             0
         )
     );
+
 }
+
 
 function scheduleKolkataMidnightRefresh() {
 
     const now =
         getKolkataLocalDate();
 
+
     const nextMidnight =
         getNextKolkataMidnight();
+
 
     const delay =
         Math.max(
@@ -423,74 +1298,120 @@ function scheduleKolkataMidnightRefresh() {
             now.getTime()
         ) + 100;
 
-    setTimeout(async function () {
 
-        updateKolkataClock();
+    setTimeout(
+        async function () {
 
-        if (
-            APP_STATE.currentJournal &&
-            document
-                .getElementById('journalPage')
-                ?.classList
-                .contains('active')
-        ) {
-            await refreshJournalData();
-        }
+            updateKolkataClock();
 
-        scheduleKolkataMidnightRefresh();
 
-    }, delay);
+            if (
+                APP_STATE.currentJournal
+            ) {
+
+                await refreshJournalData();
+
+            }
+
+
+            scheduleKolkataMidnightRefresh();
+
+        },
+        delay
+    );
+
 }
 
+
 // ============================================================================
-// AUTHENTICATION
+// LOGIN
 // ============================================================================
 
 async function handleLogin(e) {
 
     e.preventDefault();
 
+
     const username =
-        document.getElementById('username')
+        document
+            .getElementById(
+                'username'
+            )
             .value
             .trim();
 
+
     const password =
-        document.getElementById('password')
+        document
+            .getElementById(
+                'password'
+            )
             .value;
 
+
     const errorEl =
-        document.getElementById('loginError');
+        document.getElementById(
+            'loginError'
+        );
 
-    errorEl.classList.remove('show');
 
-    if (!username || !password) {
+    if (errorEl) {
+
+        errorEl.classList.remove(
+            'show'
+        );
+
+    }
+
+
+    if (
+        !username ||
+        !password
+    ) {
+
         showLoginError(
             'Please enter username and password'
         );
+
         return;
+
     }
+
 
     try {
 
         const response =
             await fetch(
-                APP_STATE.appScriptUrl,
+                appScriptUrl,
                 {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'login',
-                        username: username,
-                        password: password
-                    })
+                    method:
+                        'POST',
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                'login',
+
+                            username:
+                                username,
+
+                            password:
+                                password
+
+                        })
+
                 }
             );
+
 
         const data =
             await response.json();
 
+
         if (
-            data.status === 'success' &&
+            data.status ===
+                'success' &&
             data.data &&
             data.data.authenticated
         ) {
@@ -498,84 +1419,170 @@ async function handleLogin(e) {
             APP_STATE.currentUser =
                 username;
 
+
             const usernameEl =
                 document.getElementById(
                     'currentUsername'
                 );
 
+
             if (usernameEl) {
+
                 usernameEl.textContent =
                     username;
+
             }
+
 
             showApp();
 
-            loadJournals();
+            await loadJournals();
 
-        } else {
+        }
+
+        else {
 
             showLoginError(
                 data.data?.message ||
                 'Login failed'
             );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
+
+        console.error(
+            'Login error:',
+            error
+        );
+
 
         showLoginError(
-            'Error: ' + error.message
+            'Error: ' +
+            error.message
         );
+
     }
+
 }
 
-function showLoginError(message) {
+
+function showLoginError(
+    message
+) {
 
     const errorEl =
         document.getElementById(
             'loginError'
         );
 
+
+    if (!errorEl) {
+        return;
+    }
+
+
     errorEl.textContent =
         message;
 
-    errorEl.classList.add('show');
+
+    errorEl.classList.add(
+        'show'
+    );
+
 }
+
+
+// ============================================================================
+// LOGOUT
+// ============================================================================
 
 function handleLogout() {
 
-    APP_STATE.currentUser = null;
-    APP_STATE.currentJournal = null;
-    APP_STATE.allTransactions = [];
-    APP_STATE.selectedDate = null;
+    APP_STATE.currentUser =
+        null;
+
+
+    APP_STATE.currentJournal =
+        null;
+
+
+    APP_STATE.allTransactions =
+        [];
+
+
+    APP_STATE.selectedDate =
+        null;
+
+
+    APP_STATE.selectedTransactionType =
+        null;
+
 
     const loginForm =
         document.getElementById(
             'loginForm'
         );
 
+
     if (loginForm) {
+
         loginForm.reset();
+
     }
+
 
     const loginError =
         document.getElementById(
             'loginError'
         );
 
+
     if (loginError) {
-        loginError.classList.remove('show');
+
+        loginError.classList.remove(
+            'show'
+        );
+
     }
 
-    document.getElementById(
-        'appContainer'
-    ).style.display = 'none';
 
-    document.getElementById(
-        'loginPage'
-    ).style.display = 'flex';
+    const appContainer =
+        document.getElementById(
+            'appContainer'
+        );
 
-    navigateToPage('dashboard');
+
+    const loginPage =
+        document.getElementById(
+            'loginPage'
+        );
+
+
+    if (appContainer) {
+
+        appContainer.style.display =
+            'none';
+
+    }
+
+
+    if (loginPage) {
+
+        loginPage.style.display =
+            'flex';
+
+    }
+
+
+    navigateToPage(
+        'dashboard'
+    );
+
 }
+
 
 // ============================================================================
 // NAVIGATION
@@ -583,134 +1590,268 @@ function handleLogout() {
 
 function showApp() {
 
-    document.getElementById(
-        'loginPage'
-    ).style.display = 'none';
+    const loginPage =
+        document.getElementById(
+            'loginPage'
+        );
 
-    document.getElementById(
-        'appContainer'
-    ).style.display = 'flex';
+
+    const appContainer =
+        document.getElementById(
+            'appContainer'
+        );
+
+
+    if (loginPage) {
+
+        loginPage.style.display =
+            'none';
+
+    }
+
+
+    if (appContainer) {
+
+        appContainer.style.display =
+            'flex';
+
+    }
+
 }
 
-function navigateToPage(page) {
 
-    // Update navigation
+function navigateToPage(
+    page
+) {
+
     document
-        .querySelectorAll('.nav-item')
-        .forEach(item => {
+        .querySelectorAll(
+            '.nav-item'
+        )
+        .forEach(
+            item => {
 
-            item.classList.remove('active');
+                item.classList.remove(
+                    'active'
+                );
 
-            if (
-                item.dataset.page === page
-            ) {
-                item.classList.add('active');
+
+                if (
+                    item.dataset.page ===
+                    page
+                ) {
+
+                    item.classList.add(
+                        'active'
+                    );
+
+                }
+
             }
-        });
+        );
 
-    // Hide all pages
+
     document
-        .querySelectorAll('.page')
-        .forEach(p => {
-            p.classList.remove('active');
-        });
+        .querySelectorAll(
+            '.page'
+        )
+        .forEach(
+            p => {
 
-    // Dashboard
-    if (page === 'dashboard') {
+                p.classList.remove(
+                    'active'
+                );
 
-        document
-            .getElementById('dashboardPage')
-            .classList
-            .add('active');
+            }
+        );
 
-        document
-            .getElementById('pageTitle')
-            .textContent = 'Dashboard';
+
+    if (
+        page ===
+        'dashboard'
+    ) {
+
+        const dashboard =
+            document.getElementById(
+                'dashboardPage'
+            );
+
+
+        if (dashboard) {
+
+            dashboard.classList.add(
+                'active'
+            );
+
+        }
+
+
+        const pageTitle =
+            document.getElementById(
+                'pageTitle'
+            );
+
+
+        if (pageTitle) {
+
+            pageTitle.textContent =
+                'Dashboard';
+
+        }
+
 
         loadJournals();
 
     }
 
-    // Journal
-    else if (page === 'journal') {
 
-        if (!APP_STATE.currentJournal) {
+    else if (
+        page ===
+        'journal'
+    ) {
+
+        if (
+            !APP_STATE.currentJournal
+        ) {
 
             alert(
                 'Please select a journal first'
             );
 
-            navigateToPage('dashboard');
+
+            navigateToPage(
+                'dashboard'
+            );
+
 
             return;
+
         }
 
-        document
-            .getElementById('journalPage')
-            .classList
-            .add('active');
 
-        document
-            .getElementById('pageTitle')
-            .textContent =
-            APP_STATE.currentJournal.journalName;
+        const journalPage =
+            document.getElementById(
+                'journalPage'
+            );
+
+
+        if (journalPage) {
+
+            journalPage.classList.add(
+                'active'
+            );
+
+        }
+
+
+        const pageTitle =
+            document.getElementById(
+                'pageTitle'
+            );
+
+
+        if (pageTitle) {
+
+            pageTitle.textContent =
+                APP_STATE.currentJournal
+                    .journalName;
+
+        }
+
 
         loadJournalDetails();
+
     }
+
 }
 
+
 // ============================================================================
-// JOURNALS
+// LOAD JOURNALS
 // ============================================================================
 
 async function loadJournals() {
+
+    if (
+        !APP_STATE.currentUser
+    ) {
+
+        return;
+
+    }
+
 
     try {
 
         const response =
             await fetch(
-                APP_STATE.appScriptUrl,
+                appScriptUrl,
                 {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'getJournals',
-                        username:
-                            APP_STATE.currentUser
-                    })
+                    method:
+                        'POST',
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                'getJournals',
+
+                            username:
+                                APP_STATE.currentUser
+
+                        })
+
                 }
             );
+
 
         const data =
             await response.json();
 
+
         if (
-            data.status === 'success'
+            data.status ===
+            'success'
         ) {
 
             displayJournals(
                 data.data.journals
             );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             'Error loading journals:',
             error
         );
+
     }
+
 }
 
-function displayJournals(journals) {
+
+// ============================================================================
+// DISPLAY JOURNALS
+// ============================================================================
+
+function displayJournals(
+    journals
+) {
 
     const container =
         document.getElementById(
             'journalsContainer'
         );
 
+
     if (!container) {
         return;
     }
+
 
     if (
         !journals ||
@@ -718,219 +1859,330 @@ function displayJournals(journals) {
     ) {
 
         container.innerHTML = `
-            <div style="grid-column:1/-1;">
-                <div class="empty-state">
-                    <h2>No Journals Yet</h2>
+
+            <div
+                style="
+                    grid-column:1/-1;
+                "
+            >
+
+                <div
+                    class="empty-state"
+                >
+
+                    <h2>
+                        No Journals Yet
+                    </h2>
+
                     <p>
-                        Create a new journal to start
-                        tracking your performance
+                        Create a new journal to
+                        start tracking your
+                        performance
                     </p>
+
                 </div>
+
             </div>
+
         `;
 
+
         return;
+
     }
 
+
     container.innerHTML =
-        journals.map(journal => `
+        journals
+            .map(
+                journal => {
 
-            <div class="journal-card">
+                    const target =
+                        parseFloat(
+                            journal.targetAmount
+                        ) || 0;
 
-                <h3>
-                    ${escapeHtml(
-                        journal.journalName
-                    )}
-                </h3>
 
-                <p>
-                    Target:
-                    ₹${parseFloat(
-                        journal.targetAmount || 0
-                    ).toLocaleString(
-                        'en-IN',
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}
-                </p>
+                    return `
 
-                <p>
-                    Period:
-                    ${formatDate(
-                        journal.startDate
-                    )}
-                    to
-                    ${formatDate(
-                        journal.endDate
-                    )}
-                </p>
+                        <div
+                            class="journal-card"
+                        >
 
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
+                            <h3>
+                                ${
+                                    escapeHtml(
+                                        journal.journalName
+                                    )
+                                }
+                            </h3>
 
-                <div class="card-actions">
 
-                    <button
-                        class="btn-small"
-                        onclick="openJournal('${journal.journalId}')"
-                    >
-                        Open
-                    </button>
+                            <p>
+                                Target:
+                                ${
+                                    formatMoney(
+                                        target
+                                    )
+                                }
+                            </p>
 
-                    <button
-                        class="btn-small btn-delete"
-                        onclick="deleteJournal('${journal.journalId}')"
-                    >
-                        Delete
-                    </button>
 
-                </div>
+                            <p>
+                                Period:
+                                ${
+                                    formatDate(
+                                        journal.startDate
+                                    )
+                                }
 
-            </div>
+                                to
 
-        `).join('');
+                                ${
+                                    formatDate(
+                                        journal.endDate
+                                    )
+                                }
+                            </p>
+
+
+                            <div
+                                class="progress-bar"
+                            >
+
+                                <div
+                                    class="progress-fill"
+                                ></div>
+
+                            </div>
+
+
+                            <div
+                                class="card-actions"
+                            >
+
+                                <button
+                                    class="btn-small"
+                                    onclick="openJournal('${escapeHtmlAttribute(journal.journalId)}')"
+                                >
+                                    Open
+                                </button>
+
+
+                                <button
+                                    class="
+                                        btn-small
+                                        btn-delete
+                                    "
+                                    onclick="deleteJournal('${escapeHtmlAttribute(journal.journalId)}')"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join('');
+
 }
+
 
 // ============================================================================
 // OPEN JOURNAL
 // ============================================================================
 
-async function openJournal(journalId) {
+async function openJournal(
+    journalId
+) {
 
     try {
 
         const response =
             await fetch(
-                APP_STATE.appScriptUrl,
+                appScriptUrl,
                 {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action:
-                            'getJournalDetails',
+                    method:
+                        'POST',
 
-                        journalId:
-                            journalId,
+                    body:
+                        JSON.stringify({
 
-                        username:
-                            APP_STATE.currentUser
-                    })
+                            action:
+                                'getJournalDetails',
+
+                            journalId:
+                                journalId,
+
+                            username:
+                                APP_STATE.currentUser
+
+                        })
+
                 }
             );
+
 
         const data =
             await response.json();
 
+
         if (
-            data.status === 'success'
+            data.status ===
+            'success'
         ) {
 
             APP_STATE.currentJournal =
                 data.data.journal;
 
+
             APP_STATE.allTransactions =
-                data.data.transactions || [];
+                data.data.transactions ||
+                [];
+
 
             APP_STATE.currentMonth =
                 new Date(
-                    data.data.journal.startDate
+                    data.data.journal
+                        .startDate
                 );
+
 
             APP_STATE.selectedDate =
                 null;
 
-            navigateToPage('journal');
+
+            navigateToPage(
+                'journal'
+            );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             'Error opening journal:',
             error
         );
+
     }
+
 }
+
 
 // ============================================================================
 // DELETE JOURNAL
 // ============================================================================
 
-async function deleteJournal(journalId) {
+async function deleteJournal(
+    journalId
+) {
 
     if (
         !confirm(
             'Are you sure you want to delete this journal?'
         )
     ) {
+
         return;
+
     }
+
 
     try {
 
         const response =
             await fetch(
-                APP_STATE.appScriptUrl,
+                appScriptUrl,
                 {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action:
-                            'deleteJournal',
+                    method:
+                        'POST',
 
-                        journalId:
-                            journalId,
+                    body:
+                        JSON.stringify({
 
-                        username:
-                            APP_STATE.currentUser
-                    })
+                            action:
+                                'deleteJournal',
+
+                            journalId:
+                                journalId,
+
+                            username:
+                                APP_STATE.currentUser
+
+                        })
+
                 }
             );
+
 
         const data =
             await response.json();
 
+
         if (
-            data.status === 'success'
+            data.status ===
+            'success'
         ) {
 
             if (
                 APP_STATE.currentJournal &&
-                APP_STATE.currentJournal.journalId ===
+                APP_STATE.currentJournal
+                    .journalId ===
                     journalId
             ) {
+
                 APP_STATE.currentJournal =
                     null;
+
 
                 APP_STATE.allTransactions =
                     [];
 
+
                 APP_STATE.selectedDate =
                     null;
+
             }
 
-            loadJournals();
 
-        } else {
+            await loadJournals();
+
+        }
+
+        else {
 
             alert(
                 data.data?.message ||
                 'Failed to delete journal'
             );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             'Error deleting journal:',
             error
         );
 
+
         alert(
             'Error deleting journal'
         );
+
     }
+
 }
+
 
 // ============================================================================
 // CREATE JOURNAL MODAL
@@ -943,14 +2195,23 @@ function openCreateJournalModal() {
             'createJournalModal'
         );
 
+
     if (!modal) {
         return;
     }
 
+
     setDefaultDates();
 
-    modal.classList.add('active');
+    updateCurrencyUI();
+
+
+    modal.classList.add(
+        'active'
+    );
+
 }
+
 
 function closeCreateJournalModal() {
 
@@ -959,42 +2220,64 @@ function closeCreateJournalModal() {
             'createJournalModal'
         );
 
+
     if (!modal) {
         return;
     }
 
-    modal.classList.remove('active');
+
+    modal.classList.remove(
+        'active'
+    );
+
 }
+
 
 // ============================================================================
 // CREATE JOURNAL
 // ============================================================================
 
-async function handleCreateJournal(e) {
+async function handleCreateJournal(
+    e
+) {
 
     e.preventDefault();
 
-    const journalName =
-        document.getElementById(
-            'journalName'
-        ).value.trim();
 
-    const targetAmount =
+    const journalName =
+        document
+            .getElementById(
+                'journalName'
+            )
+            .value
+            .trim();
+
+
+    const enteredTarget =
         parseFloat(
-            document.getElementById(
-                'targetAmount'
-            ).value
+            document
+                .getElementById(
+                    'targetAmount'
+                )
+                .value
         );
 
+
     const startDate =
-        document.getElementById(
-            'startDate'
-        ).value;
+        document
+            .getElementById(
+                'startDate'
+            )
+            .value;
+
 
     const endDate =
-        document.getElementById(
-            'endDate'
-        ).value;
+        document
+            .getElementById(
+                'endDate'
+            )
+            .value;
+
 
     if (!journalName) {
 
@@ -1003,11 +2286,15 @@ async function handleCreateJournal(e) {
         );
 
         return;
+
     }
 
+
     if (
-        !Number.isFinite(targetAmount) ||
-        targetAmount <= 0
+        !Number.isFinite(
+            enteredTarget
+        ) ||
+        enteredTarget <= 0
     ) {
 
         alert(
@@ -1015,267 +2302,451 @@ async function handleCreateJournal(e) {
         );
 
         return;
+
     }
 
-    if (!startDate || !endDate) {
+
+    if (
+        !startDate ||
+        !endDate
+    ) {
 
         alert(
             'Please select start and end dates'
         );
 
         return;
+
     }
 
-    if (endDate < startDate) {
+
+    if (
+        endDate <
+        startDate
+    ) {
 
         alert(
             'End date cannot be before start date'
         );
 
         return;
+
     }
+
+
+    // Selected currency → INR
+
+    const targetAmountINR =
+        convertToINR(
+            enteredTarget
+        );
+
 
     try {
 
         const response =
             await fetch(
-                APP_STATE.appScriptUrl,
+                appScriptUrl,
                 {
-                    method: 'POST',
-                    body: JSON.stringify({
+                    method:
+                        'POST',
 
-                        action:
-                            'createJournal',
+                    body:
+                        JSON.stringify({
 
-                        username:
-                            APP_STATE.currentUser,
+                            action:
+                                'createJournal',
 
-                        journalName:
-                            journalName,
+                            username:
+                                APP_STATE.currentUser,
 
-                        targetAmount:
-                            targetAmount,
+                            journalName:
+                                journalName,
 
-                        startDate:
-                            startDate,
+                            targetAmount:
+                                targetAmountINR,
 
-                        endDate:
-                            endDate
+                            startDate:
+                                startDate,
 
-                    })
+                            endDate:
+                                endDate
+
+                        })
+
                 }
             );
+
 
         const data =
             await response.json();
 
+
         if (
-            data.status === 'success'
+            data.status ===
+            'success'
         ) {
 
             closeCreateJournalModal();
+
 
             const form =
                 document.getElementById(
                     'createJournalForm'
                 );
 
+
             if (form) {
+
                 form.reset();
+
             }
+
 
             setDefaultDates();
 
             await loadJournals();
 
-        } else {
+        }
+
+        else {
 
             alert(
                 data.data?.message ||
                 'Failed to create journal'
             );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             'Error creating journal:',
             error
         );
 
+
         alert(
             'Error creating journal'
         );
+
     }
+
 }
 
-// ============================================================================
-// UTILITY
-// ============================================================================
-
-function escapeHtml(value) {
-
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
 
 // ============================================================================
-// JOURNAL DETAILS & DISPLAY
+// JOURNAL DETAILS
 // ============================================================================
 
 async function loadJournalDetails() {
 
-    if (!APP_STATE.currentJournal) {
+    if (
+        !APP_STATE.currentJournal
+    ) {
+
         return;
+
     }
 
+
     updateJournalHeader();
+
     renderCalendar();
+
     updateRecentTransactions();
+
 }
+
+
+// ============================================================================
+// JOURNAL HEADER
+// ============================================================================
 
 function updateJournalHeader() {
 
     const journal =
         APP_STATE.currentJournal;
 
+
+    if (!journal) {
+        return;
+    }
+
+
     const stats =
         calculateStats();
 
-    document.getElementById(
-        'journalTitle'
-    ).textContent =
-        journal.journalName;
 
-    document.getElementById(
-        'statTarget'
-    ).textContent =
-        `₹${parseFloat(
-            journal.targetAmount
-        ).toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
-
-    document.getElementById(
-        'statNetPL'
-    ).textContent =
-        `${stats.netPL < 0 ? '-' : stats.netPL > 0 ? '+' : ''}₹${Math.abs(
-            stats.netPL
-        ).toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
-
-    document.getElementById(
-        'statDaysCompleted'
-    ).textContent =
-        stats.daysCompleted;
-
-    document.getElementById(
-        'statDaysRemaining'
-    ).textContent =
-        stats.daysRemaining;
-
-    document.getElementById(
-        'statAmountNeeded'
-    ).textContent =
-        `₹${stats.amountStillNeeded.toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
-
-    document.getElementById(
-        'statProgress'
-    ).textContent =
-        `${stats.progressPercentage.toFixed(1)}%`;
-
-    const progressPercentage =
-        Math.min(
-            100,
-            stats.progressPercentage
+    const journalTitle =
+        document.getElementById(
+            'journalTitle'
         );
 
-    document.getElementById(
-        'progressFill'
-    ).style.width =
-        progressPercentage + '%';
 
-    document.getElementById(
-        'progressText'
-    ).textContent =
-        `${progressPercentage.toFixed(1)}% Complete`;
+    if (journalTitle) {
 
-    // Insights
+        journalTitle.textContent =
+            journal.journalName;
 
-    document.getElementById(
-        'insightAvgProfit'
-    ).textContent =
-        `₹${stats.avgProfitPerDay.toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
+    }
 
-    document.getElementById(
-        'insightRequiredPerDay'
-    ).textContent =
-        `₹${stats.requiredPerDay.toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
 
-    document.getElementById(
-        'insightBestDay'
-    ).textContent =
-        `${stats.bestDayAmount < 0 ? '-' : stats.bestDayAmount > 0 ? '+' : ''}₹${Math.abs(
-            stats.bestDayAmount
-        ).toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
+    const statTarget =
+        document.getElementById(
+            'statTarget'
+        );
 
-    document.getElementById(
-        'insightBestDayDate'
-    ).textContent =
-        stats.bestDay
-            ? formatDate(stats.bestDay)
-            : '-';
 
-    document.getElementById(
-        'insightWorstDay'
-    ).textContent =
-        `${stats.worstDayAmount < 0 ? '-' : stats.worstDayAmount > 0 ? '+' : ''}₹${Math.abs(
-            stats.worstDayAmount
-        ).toLocaleString(
-            'en-IN',
-            {
-                minimumFractionDigits: 2
-            }
-        )}`;
+    if (statTarget) {
 
-    document.getElementById(
-        'insightWorstDayDate'
-    ).textContent =
-        stats.worstDay
-            ? formatDate(stats.worstDay)
-            : '-';
+        statTarget.textContent =
+            formatMoney(
+                journal.targetAmount
+            );
+
+    }
+
+
+    const statNetPL =
+        document.getElementById(
+            'statNetPL'
+        );
+
+
+    if (statNetPL) {
+
+        statNetPL.textContent =
+            formatMoney(
+                stats.netPL,
+                {
+                    showSign:
+                        true
+                }
+            );
+
+
+        statNetPL.className =
+            'stat-value ' +
+
+            (
+                stats.netPL > 0
+                    ? 'profit'
+                    : stats.netPL < 0
+                        ? 'loss'
+                        : 'neutral'
+            );
+
+    }
+
+
+    const statDaysCompleted =
+        document.getElementById(
+            'statDaysCompleted'
+        );
+
+
+    if (statDaysCompleted) {
+
+        statDaysCompleted.textContent =
+            stats.daysCompleted;
+
+    }
+
+
+    const statDaysRemaining =
+        document.getElementById(
+            'statDaysRemaining'
+        );
+
+
+    if (statDaysRemaining) {
+
+        statDaysRemaining.textContent =
+            stats.daysRemaining;
+
+    }
+
+
+    const statAmountNeeded =
+        document.getElementById(
+            'statAmountNeeded'
+        );
+
+
+    if (statAmountNeeded) {
+
+        statAmountNeeded.textContent =
+            formatMoney(
+                stats.amountStillNeeded
+            );
+
+    }
+
+
+    const statProgress =
+        document.getElementById(
+            'statProgress'
+        );
+
+
+    if (statProgress) {
+
+        statProgress.textContent =
+            `${stats.progressPercentage.toFixed(
+                1
+            )}%`;
+
+    }
+
+
+    const progressFill =
+        document.getElementById(
+            'progressFill'
+        );
+
+
+    if (progressFill) {
+
+        progressFill.style.width =
+            Math.min(
+                100,
+                stats.progressPercentage
+            ) + '%';
+
+    }
+
+
+    const progressText =
+        document.getElementById(
+            'progressText'
+        );
+
+
+    if (progressText) {
+
+        progressText.textContent =
+            `${Math.min(
+                100,
+                stats.progressPercentage
+            ).toFixed(
+                1
+            )}% Complete`;
+
+    }
+
+
+    const insightAvgProfit =
+        document.getElementById(
+            'insightAvgProfit'
+        );
+
+
+    if (insightAvgProfit) {
+
+        insightAvgProfit.textContent =
+            formatMoney(
+                stats.avgProfitPerDay
+            );
+
+    }
+
+
+    const insightRequiredPerDay =
+        document.getElementById(
+            'insightRequiredPerDay'
+        );
+
+
+    if (insightRequiredPerDay) {
+
+        insightRequiredPerDay.textContent =
+            formatMoney(
+                stats.requiredPerDay
+            );
+
+    }
+
+
+    const insightBestDay =
+        document.getElementById(
+            'insightBestDay'
+        );
+
+
+    if (insightBestDay) {
+
+        insightBestDay.textContent =
+            formatMoney(
+                stats.bestDayAmount,
+                {
+                    showSign:
+                        true
+                }
+            );
+
+    }
+
+
+    const insightBestDayDate =
+        document.getElementById(
+            'insightBestDayDate'
+        );
+
+
+    if (insightBestDayDate) {
+
+        insightBestDayDate.textContent =
+            stats.bestDay
+                ? formatDate(
+                    stats.bestDay
+                )
+                : '-';
+
+    }
+
+
+    const insightWorstDay =
+        document.getElementById(
+            'insightWorstDay'
+        );
+
+
+    if (insightWorstDay) {
+
+        insightWorstDay.textContent =
+            formatMoney(
+                stats.worstDayAmount,
+                {
+                    showSign:
+                        true
+                }
+            );
+
+    }
+
+
+    const insightWorstDayDate =
+        document.getElementById(
+            'insightWorstDayDate'
+        );
+
+
+    if (insightWorstDayDate) {
+
+        insightWorstDayDate.textContent =
+            stats.worstDay
+                ? formatDate(
+                    stats.worstDay
+                )
+                : '-';
+
+    }
+
 }
+
 
 // ============================================================================
 // CALCULATE STATISTICS
@@ -1286,8 +2757,50 @@ function calculateStats() {
     const journal =
         APP_STATE.currentJournal;
 
+
     const transactions =
-        APP_STATE.allTransactions || [];
+        APP_STATE.allTransactions ||
+        [];
+
+
+    if (!journal) {
+
+        return {
+
+            totalProfit: 0,
+
+            totalLoss: 0,
+
+            netPL: 0,
+
+            daysCompleted: 0,
+
+            daysRemaining: 0,
+
+            totalDays: 0,
+
+            amountStillNeeded: 0,
+
+            progressPercentage: 0,
+
+            dailyNetProfit: {},
+
+            bestDay: null,
+
+            bestDayAmount: 0,
+
+            worstDay: null,
+
+            worstDayAmount: 0,
+
+            avgProfitPerDay: 0,
+
+            requiredPerDay: 0
+
+        };
+
+    }
+
 
     const startDate =
         new Date(
@@ -1295,14 +2808,17 @@ function calculateStats() {
             'T00:00:00Z'
         );
 
+
     const endDate =
         new Date(
             journal.endDate +
             'T00:00:00Z'
         );
 
+
     const todayDateStr =
         getTodayKolkataDateString();
+
 
     const today =
         new Date(
@@ -1310,46 +2826,89 @@ function calculateStats() {
             'T00:00:00Z'
         );
 
+
     let totalProfit = 0;
+
     let totalLoss = 0;
+
 
     const dailyNetProfit = {};
 
-    transactions.forEach(txn => {
 
-        const amount =
-            parseFloat(txn.amount) || 0;
+    transactions.forEach(
+        txn => {
 
-        const date =
-            String(
-                txn.transactionDate
-            ).slice(0, 10);
+            const amount =
+                parseFloat(
+                    txn.amount
+                ) || 0;
 
-        if (
-            !Object.prototype.hasOwnProperty.call(
-                dailyNetProfit,
-                date
-            )
-        ) {
-            dailyNetProfit[date] = 0;
+
+            const date =
+                String(
+                    txn.transactionDate
+                ).slice(
+                    0,
+                    10
+                );
+
+
+            if (
+                !Object.prototype
+                    .hasOwnProperty
+                    .call(
+                        dailyNetProfit,
+                        date
+                    )
+            ) {
+
+                dailyNetProfit[
+                    date
+                ] = 0;
+
+            }
+
+
+            if (
+                txn.type ===
+                'PROFIT'
+            ) {
+
+                totalProfit +=
+                    amount;
+
+
+                dailyNetProfit[
+                    date
+                ] +=
+                    amount;
+
+            }
+
+            else if (
+                txn.type ===
+                'LOSS'
+            ) {
+
+                totalLoss +=
+                    amount;
+
+
+                dailyNetProfit[
+                    date
+                ] -=
+                    amount;
+
+            }
+
         }
+    );
 
-        if (txn.type === 'PROFIT') {
-
-            totalProfit += amount;
-
-            dailyNetProfit[date] += amount;
-
-        } else if (txn.type === 'LOSS') {
-
-            totalLoss += amount;
-
-            dailyNetProfit[date] -= amount;
-        }
-    });
 
     const netPL =
-        totalProfit - totalLoss;
+        totalProfit -
+        totalLoss;
+
 
     const daysCompleted =
         Math.floor(
@@ -1357,8 +2916,14 @@ function calculateStats() {
                 today.getTime() -
                 startDate.getTime()
             ) /
-            (1000 * 60 * 60 * 24)
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
         );
+
 
     const daysRemaining =
         Math.ceil(
@@ -1366,8 +2931,14 @@ function calculateStats() {
                 endDate.getTime() -
                 today.getTime()
             ) /
-            (1000 * 60 * 60 * 24)
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
         );
+
 
     const totalDays =
         Math.ceil(
@@ -1375,78 +2946,133 @@ function calculateStats() {
                 endDate.getTime() -
                 startDate.getTime()
             ) /
-            (1000 * 60 * 60 * 24)
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
         );
+
 
     const target =
         parseFloat(
             journal.targetAmount
         ) || 0;
 
+
     const amountStillNeeded =
         Math.max(
             0,
-            target - netPL
+            target -
+            netPL
         );
 
-    const progressPercentage =
+
+    const rawProgress =
         target > 0
-            ? (netPL / target) * 100
+            ? (
+                netPL /
+                target
+            ) * 100
             : 0;
 
+
+    const progressPercentage =
+        Math.min(
+            100,
+            Math.max(
+                0,
+                rawProgress
+            )
+        );
+
+
     let bestDay = null;
-    let bestDayAmount = -Infinity;
+
+    let bestDayAmount =
+        -Infinity;
+
 
     let worstDay = null;
-    let worstDayAmount = Infinity;
+
+    let worstDayAmount =
+        Infinity;
+
 
     for (
-        const date in dailyNetProfit
+        const date in
+        dailyNetProfit
     ) {
 
         const value =
-            dailyNetProfit[date];
+            dailyNetProfit[
+                date
+            ];
+
 
         if (
-            value > bestDayAmount
+            value >
+            bestDayAmount
         ) {
-            bestDayAmount = value;
-            bestDay = date;
+
+            bestDayAmount =
+                value;
+
+            bestDay =
+                date;
+
         }
 
+
         if (
-            value < worstDayAmount
+            value <
+            worstDayAmount
         ) {
-            worstDayAmount = value;
-            worstDay = date;
+
+            worstDayAmount =
+                value;
+
+            worstDay =
+                date;
+
         }
+
     }
 
-    // No transaction days
+
     if (
         Object.keys(
             dailyNetProfit
         ).length === 0
     ) {
+
         bestDayAmount = 0;
+
         worstDayAmount = 0;
+
     }
+
 
     const transactionDayCount =
         Object.keys(
             dailyNetProfit
         ).length;
 
+
     const avgProfitPerDay =
         transactionDayCount > 0
-            ? netPL / transactionDayCount
+            ? netPL /
+              transactionDayCount
             : 0;
+
 
     const requiredPerDay =
         daysRemaining > 0
             ? amountStillNeeded /
               daysRemaining
             : 0;
+
 
     return {
 
@@ -1472,14 +3098,7 @@ function calculateStats() {
 
         amountStillNeeded,
 
-        progressPercentage:
-            Math.min(
-                100,
-                Math.max(
-                    0,
-                    progressPercentage
-                )
-            ),
+        progressPercentage,
 
         dailyNetProfit,
 
@@ -1494,8 +3113,11 @@ function calculateStats() {
         avgProfitPerDay,
 
         requiredPerDay
+
     };
+
 }
+
 
 // ============================================================================
 // CALENDAR
@@ -1503,13 +3125,24 @@ function calculateStats() {
 
 function renderCalendar() {
 
+    if (
+        !APP_STATE.currentJournal
+    ) {
+
+        return;
+
+    }
+
+
     const year =
         APP_STATE.currentMonth
             .getFullYear();
 
+
     const month =
         APP_STATE.currentMonth
             .getMonth();
+
 
     const monthTitle =
         new Date(
@@ -1519,20 +3152,28 @@ function renderCalendar() {
         ).toLocaleDateString(
             'en-IN',
             {
-                month: 'long',
-                year: 'numeric'
+                month:
+                    'long',
+
+                year:
+                    'numeric'
             }
         );
+
 
     const calendarMonth =
         document.getElementById(
             'calendarMonth'
         );
 
+
     if (calendarMonth) {
+
         calendarMonth.textContent =
             monthTitle;
+
     }
+
 
     const firstDay =
         new Date(
@@ -1541,6 +3182,7 @@ function renderCalendar() {
             1
         );
 
+
     const lastDay =
         new Date(
             year,
@@ -1548,242 +3190,358 @@ function renderCalendar() {
             0
         );
 
+
     const daysInMonth =
         lastDay.getDate();
+
 
     const startingDayOfWeek =
         firstDay.getDay();
 
+
     const stats =
         calculateStats();
+
 
     const dailyNetProfit =
         stats.dailyNetProfit;
 
-    const journal =
-        APP_STATE.currentJournal;
 
     let html = '';
 
-    // Previous month
+
     for (
-        let i = startingDayOfWeek - 1;
+        let i =
+            startingDayOfWeek - 1;
+
         i >= 0;
+
         i--
     ) {
+
         html += `
-            <div class="calendar-day other-month"></div>
+
+            <div
+                class="
+                    calendar-day
+                    other-month
+                "
+            ></div>
+
         `;
+
     }
 
-    // Current month
+
     for (
         let day = 1;
+
         day <= daysInMonth;
+
         day++
     ) {
 
         const dateStr =
             `${year}-${String(
                 month + 1
-            ).padStart(2, '0')}-${String(
+            ).padStart(
+                2,
+                '0'
+            )}-${String(
                 day
-            ).padStart(2, '0')}`;
+            ).padStart(
+                2,
+                '0'
+            )}`;
+
 
         const hasTransactions =
-            Object.prototype.hasOwnProperty.call(
-                dailyNetProfit,
-                dateStr
-            );
+            Object.prototype
+                .hasOwnProperty
+                .call(
+                    dailyNetProfit,
+                    dateStr
+                );
+
 
         const dayAmount =
             hasTransactions
-                ? dailyNetProfit[dateStr]
+                ? dailyNetProfit[
+                    dateStr
+                ]
                 : null;
+
 
         const isToday =
             isTodayKolkata(
                 dateStr
             );
 
+
         let dayClass =
             isToday
                 ? 'today'
                 : '';
 
+
         let dayContent = `
-            <div class="calendar-day-date">
+
+            <div
+                class="
+                    calendar-day-date
+                "
+            >
                 ${day}
             </div>
+
         `;
 
-        // -----------------------------------------------------
-        // PROFIT
-        // -----------------------------------------------------
 
         if (
             hasTransactions &&
             dayAmount > 0
         ) {
 
-            dayClass += ' profit';
+            dayClass +=
+                ' profit';
+
 
             dayContent += `
-                <div class="calendar-day-amount">
-                    +₹${Math.abs(
+
+                <div
+                    class="
+                        calendar-day-amount
+                    "
+                >
+                    +${formatMoney(
                         dayAmount
-                    ).toLocaleString(
-                        'en-IN',
-                        {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0
-                        }
                     )}
                 </div>
 
-                <div class="calendar-day-status">
+
+                <div
+                    class="
+                        calendar-day-status
+                    "
+                >
                     PROFIT
                 </div>
+
             `;
+
         }
 
-        // -----------------------------------------------------
-        // LOSS
-        // -----------------------------------------------------
 
         else if (
             hasTransactions &&
             dayAmount < 0
         ) {
 
-            dayClass += ' loss';
+            dayClass +=
+                ' loss';
+
 
             dayContent += `
-                <div class="calendar-day-amount">
-                    -₹${Math.abs(
-                        dayAmount
-                    ).toLocaleString(
-                        'en-IN',
-                        {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0
-                        }
+
+                <div
+                    class="
+                        calendar-day-amount
+                    "
+                >
+                    -${formatMoney(
+                        Math.abs(
+                            dayAmount
+                        )
                     )}
                 </div>
 
-                <div class="calendar-day-status">
+
+                <div
+                    class="
+                        calendar-day-status
+                    "
+                >
                     LOSS
                 </div>
+
             `;
+
         }
 
-        // -----------------------------------------------------
-        // ZERO NET P/L
-        // -----------------------------------------------------
 
         else if (
             hasTransactions &&
             dayAmount === 0
         ) {
 
-            dayClass += ' neutral';
+            dayClass +=
+                ' neutral';
+
 
             dayContent += `
-                <div class="calendar-day-amount">
-                    ₹0
+
+                <div
+                    class="
+                        calendar-day-amount
+                    "
+                >
+                    ${formatMoney(0)}
                 </div>
 
-                <div class="calendar-day-status">
+
+                <div
+                    class="
+                        calendar-day-status
+                    "
+                >
                     NET P/L
                 </div>
+
             `;
+
         }
 
-        // -----------------------------------------------------
-        // NO ENTRY
-        // -----------------------------------------------------
 
         else {
 
             dayClass +=
                 ' neutral empty';
 
+
             dayContent += `
-                <div class="calendar-day-amount">
+
+                <div
+                    class="
+                        calendar-day-amount
+                    "
+                >
                     No Entry
                 </div>
+
             `;
+
 
             if (isToday) {
 
                 dayContent += `
-                    <div class="calendar-day-status">
+
+                    <div
+                        class="
+                            calendar-day-status
+                        "
+                    >
                         TODAY
                     </div>
+
                 `;
+
             }
+
         }
 
-        // Today + transaction
+
         if (
             isToday &&
             hasTransactions
         ) {
 
             dayContent += `
-                <div class="calendar-day-status">
+
+                <div
+                    class="
+                        calendar-day-status
+                    "
+                >
                     TODAY
                 </div>
+
             `;
+
         }
 
-        // Selected date
+
         if (
             APP_STATE.selectedDate ===
             dateStr
         ) {
-            dayClass += ' selected';
+
+            dayClass +=
+                ' selected';
+
         }
 
+
         html += `
+
             <div
-                class="calendar-day ${dayClass}"
-                onclick="selectDate('${dateStr}', this)"
+                class="
+                    calendar-day
+                    ${dayClass}
+                "
+                onclick="
+                    selectDate(
+                        '${dateStr}',
+                        this
+                    )
+                "
             >
+
                 ${dayContent}
+
             </div>
+
         `;
+
     }
 
-    // Fill remaining calendar cells
+
     const usedCells =
         startingDayOfWeek +
         daysInMonth;
 
+
     const remainingDays =
-        42 - usedCells;
+        42 -
+        usedCells;
+
 
     for (
         let i = 1;
+
         i <= remainingDays;
+
         i++
     ) {
 
         html += `
-            <div class="calendar-day other-month"></div>
+
+            <div
+                class="
+                    calendar-day
+                    other-month
+                "
+            ></div>
+
         `;
+
     }
+
 
     const calendarDays =
         document.getElementById(
             'calendarDays'
         );
 
+
     if (calendarDays) {
+
         calendarDays.innerHTML =
             html;
+
     }
+
 }
+
 
 // ============================================================================
 // CALENDAR NAVIGATION
@@ -1791,24 +3549,34 @@ function renderCalendar() {
 
 function previousMonth() {
 
-    APP_STATE.currentMonth.setMonth(
-        APP_STATE.currentMonth.getMonth() - 1
-    );
+    APP_STATE.currentMonth
+        .setMonth(
+            APP_STATE.currentMonth
+                .getMonth() - 1
+        );
+
 
     renderCalendar();
+
 }
+
 
 function nextMonth() {
 
-    APP_STATE.currentMonth.setMonth(
-        APP_STATE.currentMonth.getMonth() + 1
-    );
+    APP_STATE.currentMonth
+        .setMonth(
+            APP_STATE.currentMonth
+                .getMonth() + 1
+        );
+
 
     renderCalendar();
+
 }
 
+
 // ============================================================================
-// SELECT CALENDAR DATE
+// SELECT DATE
 // ============================================================================
 
 async function selectDate(
@@ -1819,76 +3587,96 @@ async function selectDate(
     APP_STATE.selectedDate =
         dateStr;
 
-    // Remove previous selection
+
     document
         .querySelectorAll(
             '.calendar-day'
         )
-        .forEach(day => {
-            day.classList.remove(
-                'selected'
-            );
-        });
+        .forEach(
+            day => {
 
-    // Add selected state
+                day.classList.remove(
+                    'selected'
+                );
+
+            }
+        );
+
+
     if (dayElement) {
 
         dayElement.classList.add(
             'selected'
         );
+
     }
+
 
     try {
 
         const response =
             await fetch(
-                APP_STATE.appScriptUrl,
+                appScriptUrl,
                 {
-                    method: 'POST',
+                    method:
+                        'POST',
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        action:
-                            'getTransactionsByDate',
+                            action:
+                                'getTransactionsByDate',
 
-                        journalId:
-                            APP_STATE
-                                .currentJournal
-                                .journalId,
+                            journalId:
+                                APP_STATE
+                                    .currentJournal
+                                    .journalId,
 
-                        username:
-                            APP_STATE.currentUser,
+                            username:
+                                APP_STATE
+                                    .currentUser,
 
-                        date:
-                            dateStr
-                    })
+                            date:
+                                dateStr
+
+                        })
+
                 }
             );
+
 
         const data =
             await response.json();
 
+
         if (
-            data.status === 'success'
+            data.status ===
+            'success'
         ) {
 
             displayDateTransactions(
                 data.data,
                 dateStr
             );
+
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             'Error loading transactions:',
             error
         );
+
     }
+
 }
 
+
 // ============================================================================
-// DATE TRANSACTION DETAILS
+// DATE TRANSACTIONS
 // ============================================================================
 
 function displayDateTransactions(
@@ -1901,100 +3689,107 @@ function displayDateTransactions(
             'dateTransactionContainer'
         );
 
+
     const listContainer =
         document.getElementById(
             'dateTransactionList'
         );
+
 
     const titleEl =
         document.getElementById(
             'dateTransactionTitle'
         );
 
+
     if (!container) {
         return;
     }
 
+
     if (titleEl) {
 
         titleEl.textContent =
-            `Transactions for ${formatDate(
-                dateStr
-            )}`;
+            `Transactions for ${
+                formatDate(
+                    dateStr
+                )
+            }`;
+
     }
+
 
     const totalProfit =
         parseFloat(
             data.totalProfit
         ) || 0;
 
+
     const totalLoss =
         parseFloat(
             data.totalLoss
         ) || 0;
+
 
     const netPL =
         parseFloat(
             data.netPL
         ) || 0;
 
+
     const totalProfitEl =
         document.getElementById(
             'dateTotalProfit'
         );
+
 
     const totalLossEl =
         document.getElementById(
             'dateTotalLoss'
         );
 
+
     const netPLEl =
         document.getElementById(
             'dateNetPL'
         );
 
+
     if (totalProfitEl) {
 
         totalProfitEl.textContent =
-            `₹${totalProfit.toLocaleString(
-                'en-IN',
-                {
-                    minimumFractionDigits: 2
-                }
-            )}`;
+            formatMoney(
+                totalProfit
+            );
+
     }
+
 
     if (totalLossEl) {
 
         totalLossEl.textContent =
-            `₹${totalLoss.toLocaleString(
-                'en-IN',
-                {
-                    minimumFractionDigits: 2
-                }
-            )}`;
+            formatMoney(
+                totalLoss
+            );
+
     }
+
 
     if (netPLEl) {
 
         netPLEl.textContent =
-            `${
-                netPL < 0
-                    ? '-'
-                    : netPL > 0
-                        ? '+'
-                        : ''
-            }₹${Math.abs(
-                netPL
-            ).toLocaleString(
-                'en-IN',
+            formatMoney(
+                netPL,
                 {
-                    minimumFractionDigits: 2
+                    showSign:
+                        true
                 }
-            )}`;
+            );
+
 
         netPLEl.className =
             'stat-value ' +
+
             (
                 netPL > 0
                     ? 'profit'
@@ -2002,18 +3797,651 @@ function displayDateTransactions(
                         ? 'loss'
                         : 'neutral'
             );
+
     }
 
+
     const transactions =
-        data.transactions || [];
+        data.transactions ||
+        [];
+
 
     if (
-        transactions.length > 0
+        transactions.length >
+        0
     ) {
 
         listContainer.innerHTML =
             transactions
-                .map(txn => {
+                .map(
+                    txn => {
+
+                        const time =
+                            new Date(
+                                txn.timestamp
+                            ).toLocaleTimeString(
+                                'en-IN',
+                                {
+                                    hour:
+                                        '2-digit',
+
+                                    minute:
+                                        '2-digit',
+
+                                    timeZone:
+                                        KOLKATA_TIMEZONE
+                                }
+                            );
+
+
+                        const amount =
+                            parseFloat(
+                                txn.amount
+                            ) || 0;
+
+
+                        return `
+
+                            <div
+                                class="
+                                    transaction-item
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        transaction-left
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            transaction-type
+                                        "
+                                    >
+                                        ${
+                                            txn.type ===
+                                            'PROFIT'
+                                                ? '📈 Profit'
+                                                : '📉 Loss'
+                                        }
+                                    </div>
+
+
+                                    <div
+                                        class="
+                                            transaction-time
+                                        "
+                                    >
+                                        ${time}
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        transaction-right
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            transaction-amount
+                                            ${
+                                                txn.type ===
+                                                'PROFIT'
+                                                    ? 'profit'
+                                                    : 'loss'
+                                            }
+                                        "
+                                    >
+
+                                        ${
+                                            txn.type ===
+                                            'PROFIT'
+                                                ? '+'
+                                                : '-'
+                                        }${
+                                            formatMoney(
+                                                amount
+                                            )
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join('');
+
+    }
+
+    else {
+
+        listContainer.innerHTML = `
+
+            <p
+                style="
+                    color: var(--text-secondary);
+                    text-align: center;
+                    padding: 20px;
+                "
+            >
+                No transactions for this date
+            </p>
+
+        `;
+
+    }
+
+
+    container.style.display =
+        'block';
+
+}
+
+
+// ============================================================================
+// DISPLAY SELECTED DATE FROM LOCAL DATA
+// ============================================================================
+
+function displaySelectedDateFromState() {
+
+    if (
+        !APP_STATE.selectedDate
+    ) {
+
+        return;
+
+    }
+
+
+    const date =
+        APP_STATE.selectedDate;
+
+
+    const transactions =
+        APP_STATE
+            .allTransactions
+            .filter(
+                txn =>
+                    String(
+                        txn.transactionDate
+                    ).slice(
+                        0,
+                        10
+                    ) === date
+            );
+
+
+    let totalProfit = 0;
+
+    let totalLoss = 0;
+
+
+    transactions.forEach(
+        txn => {
+
+            const amount =
+                parseFloat(
+                    txn.amount
+                ) || 0;
+
+
+            if (
+                txn.type ===
+                'PROFIT'
+            ) {
+
+                totalProfit +=
+                    amount;
+
+            }
+
+            else if (
+                txn.type ===
+                'LOSS'
+            ) {
+
+                totalLoss +=
+                    amount;
+
+            }
+
+        }
+    );
+
+
+    displayDateTransactions(
+        {
+            totalProfit,
+
+            totalLoss,
+
+            netPL:
+                totalProfit -
+                totalLoss,
+
+            transactions
+
+        },
+
+        date
+
+    );
+
+}
+
+
+// ============================================================================
+// QUICK ACTIONS
+// ============================================================================
+
+function selectTransactionType(
+    type
+) {
+
+    APP_STATE.selectedTransactionType =
+        type;
+
+
+    const profitButton =
+        document.getElementById(
+            'btnProfit'
+        );
+
+
+    const lossButton =
+        document.getElementById(
+            'btnLoss'
+        );
+
+
+    if (profitButton) {
+
+        profitButton.classList.remove(
+            'selected'
+        );
+
+    }
+
+
+    if (lossButton) {
+
+        lossButton.classList.remove(
+            'selected'
+        );
+
+    }
+
+
+    if (
+        type ===
+        'PROFIT' &&
+        profitButton
+    ) {
+
+        profitButton.classList.add(
+            'selected'
+        );
+
+    }
+
+
+    if (
+        type ===
+        'LOSS' &&
+        lossButton
+    ) {
+
+        lossButton.classList.add(
+            'selected'
+        );
+
+    }
+
+}
+
+
+// ============================================================================
+// ADD TRANSACTION
+// ============================================================================
+
+async function handleAddTransaction() {
+
+    if (
+        !APP_STATE.currentJournal
+    ) {
+
+        alert(
+            'Please select a journal first'
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !APP_STATE.selectedTransactionType
+    ) {
+
+        alert(
+            'Please select PROFIT or LOSS'
+        );
+
+        return;
+
+    }
+
+
+    const enteredAmount =
+        parseFloat(
+            document
+                .getElementById(
+                    'quickAmount'
+                )
+                .value
+        );
+
+
+    if (
+        !Number.isFinite(
+            enteredAmount
+        ) ||
+        enteredAmount <= 0
+    ) {
+
+        alert(
+            'Please enter a valid amount'
+        );
+
+        return;
+
+    }
+
+
+    // Selected currency → INR
+
+    const amountINR =
+        convertToINR(
+            enteredAmount
+        );
+
+
+    // Always use Kolkata date
+
+    const today =
+        getTodayKolkataDateString();
+
+
+    try {
+
+        const response =
+            await fetch(
+                appScriptUrl,
+                {
+                    method:
+                        'POST',
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                'addTransaction',
+
+                            journalId:
+                                APP_STATE
+                                    .currentJournal
+                                    .journalId,
+
+                            username:
+                                APP_STATE
+                                    .currentUser,
+
+                            type:
+                                APP_STATE
+                                    .selectedTransactionType,
+
+                            amount:
+                                amountINR,
+
+                            transactionDate:
+                                today
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            data.status ===
+            'success'
+        ) {
+
+            const quickAmount =
+                document.getElementById(
+                    'quickAmount'
+                );
+
+
+            if (quickAmount) {
+
+                quickAmount.value =
+                    '';
+
+            }
+
+
+            selectTransactionType(
+                null
+            );
+
+
+            await refreshJournalData();
+
+        }
+
+        else {
+
+            alert(
+                data.data?.message ||
+                'Failed to add transaction'
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            'Error adding transaction:',
+            error
+        );
+
+
+        alert(
+            'Error adding transaction'
+        );
+
+    }
+
+}
+
+
+// ============================================================================
+// REFRESH JOURNAL DATA
+// ============================================================================
+
+async function refreshJournalData() {
+
+    if (
+        !APP_STATE.currentJournal
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                appScriptUrl,
+                {
+                    method:
+                        'POST',
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                'getJournalDetails',
+
+                            journalId:
+                                APP_STATE
+                                    .currentJournal
+                                    .journalId,
+
+                            username:
+                                APP_STATE
+                                    .currentUser
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            data.status ===
+            'success'
+        ) {
+
+            APP_STATE.currentJournal =
+                data.data.journal;
+
+
+            APP_STATE.allTransactions =
+                data.data.transactions ||
+                [];
+
+
+            updateJournalHeader();
+
+            renderCalendar();
+
+            updateRecentTransactions();
+
+
+            if (
+                APP_STATE.selectedDate
+            ) {
+
+                displaySelectedDateFromState();
+
+            }
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            'Error refreshing data:',
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================================================
+// RECENT TRANSACTIONS
+// ============================================================================
+
+function updateRecentTransactions() {
+
+    const container =
+        document.getElementById(
+            'recentTransactionList'
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const transactions =
+        [
+            ...(APP_STATE
+                .allTransactions ||
+                [])
+        ]
+            .sort(
+                (a, b) =>
+                    new Date(
+                        b.timestamp
+                    ) -
+                    new Date(
+                        a.timestamp
+                    )
+            )
+            .slice(
+                0,
+                20
+            );
+
+
+    if (
+        transactions.length ===
+        0
+    ) {
+
+        container.innerHTML = `
+
+            <p
+                style="
+                    color: var(--text-secondary);
+                    text-align: center;
+                    padding: 20px;
+                "
+            >
+                No transactions yet
+            </p>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        transactions
+            .map(
+                txn => {
 
                     const time =
                         new Date(
@@ -2028,523 +4456,211 @@ function displayDateTransactions(
                                     '2-digit',
 
                                 timeZone:
-                                    'Asia/Kolkata'
+                                    KOLKATA_TIMEZONE
                             }
                         );
+
+
+                    const date =
+                        formatDate(
+                            txn.transactionDate
+                        );
+
 
                     const amount =
                         parseFloat(
                             txn.amount
                         ) || 0;
 
+
                     return `
-                        <div class="transaction-item">
 
-                            <div class="transaction-left">
+                        <div
+                            class="
+                                transaction-item
+                            "
+                        >
 
-                                <div class="transaction-type">
+                            <div
+                                class="
+                                    transaction-left
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        transaction-type
+                                    "
+                                >
                                     ${
-                                        txn.type === 'PROFIT'
+                                        txn.type ===
+                                        'PROFIT'
                                             ? '📈 Profit'
                                             : '📉 Loss'
                                     }
                                 </div>
 
-                                <div class="transaction-time">
+
+                                <div
+                                    class="
+                                        transaction-time
+                                    "
+                                >
+                                    ${date}
+                                    at
                                     ${time}
                                 </div>
 
                             </div>
 
-                            <div class="transaction-right">
+
+                            <div
+                                class="
+                                    transaction-right
+                                "
+                            >
 
                                 <div
-                                    class="transaction-amount ${
-                                        txn.type === 'PROFIT'
-                                            ? 'profit'
-                                            : 'loss'
-                                    }"
+                                    class="
+                                        transaction-amount
+                                        ${
+                                            txn.type ===
+                                            'PROFIT'
+                                                ? 'profit'
+                                                : 'loss'
+                                        }
+                                    "
                                 >
+
                                     ${
-                                        txn.type === 'PROFIT'
+                                        txn.type ===
+                                        'PROFIT'
                                             ? '+'
                                             : '-'
-                                    }₹${amount.toLocaleString(
-                                        'en-IN',
-                                        {
-                                            minimumFractionDigits: 2
-                                        }
-                                    )}
+                                    }${
+                                        formatMoney(
+                                            amount
+                                        )
+                                    }
+
                                 </div>
 
                             </div>
 
                         </div>
+
                     `;
-                })
-                .join('');
 
-    } else {
-
-        listContainer.innerHTML = `
-            <p
-                style="
-                    color: var(--text-secondary);
-                    text-align: center;
-                    padding: 20px;
-                "
-            >
-                No transactions for this date
-            </p>
-        `;
-    }
-
-    container.style.display =
-        'block';
-}
-
-// ============================================================================
-// QUICK ACTIONS
-// ============================================================================
-
-function selectTransactionType(type) {
-
-    APP_STATE.selectedTransactionType =
-        type;
-
-    const profitButton =
-        document.getElementById(
-            'btnProfit'
-        );
-
-    const lossButton =
-        document.getElementById(
-            'btnLoss'
-        );
-
-    if (profitButton) {
-
-        profitButton.classList.remove(
-            'selected'
-        );
-    }
-
-    if (lossButton) {
-
-        lossButton.classList.remove(
-            'selected'
-        );
-    }
-
-    if (
-        type === 'PROFIT' &&
-        profitButton
-    ) {
-
-        profitButton.classList.add(
-            'selected'
-        );
-    }
-
-    if (
-        type === 'LOSS' &&
-        lossButton
-    ) {
-
-        lossButton.classList.add(
-            'selected'
-        );
-    }
-}
-
-async function handleAddTransaction() {
-
-    if (
-        !APP_STATE.currentJournal
-    ) {
-
-        alert(
-            'Please select a journal first'
-        );
-
-        return;
-    }
-
-    if (
-        !APP_STATE.selectedTransactionType
-    ) {
-
-        alert(
-            'Please select PROFIT or LOSS'
-        );
-
-        return;
-    }
-
-    const amount =
-        parseFloat(
-            document.getElementById(
-                'quickAmount'
-            ).value
-        );
-
-    if (
-        !Number.isFinite(amount) ||
-        amount <= 0
-    ) {
-
-        alert(
-            'Please enter a valid amount'
-        );
-
-        return;
-    }
-
-    // IMPORTANT:
-    // Always use Kolkata date.
-    // Never use toISOString().split('T')[0]
-    // because that returns UTC date.
-
-    const today =
-        getTodayKolkataDateString();
-
-    try {
-
-        const response =
-            await fetch(
-                APP_STATE.appScriptUrl,
-                {
-                    method: 'POST',
-
-                    body: JSON.stringify({
-
-                        action:
-                            'addTransaction',
-
-                        journalId:
-                            APP_STATE
-                                .currentJournal
-                                .journalId,
-
-                        username:
-                            APP_STATE.currentUser,
-
-                        type:
-                            APP_STATE
-                                .selectedTransactionType,
-
-                        amount:
-                            amount,
-
-                        transactionDate:
-                            today
-                    })
                 }
-            );
-
-        const data =
-            await response.json();
-
-        if (
-            data.status === 'success'
-        ) {
-
-            document.getElementById(
-                'quickAmount'
-            ).value = '';
-
-            selectTransactionType(
-                null
-            );
-
-            // Immediately reload everything
-            await refreshJournalData();
-
-            // If today's calendar cell is visible,
-            // visually select it.
-            if (
-                isTodayKolkata(today)
-            ) {
-
-                const todayCell =
-                    document.querySelector(
-                        `.calendar-day[onclick*="${today}"]`
-                    );
-
-                if (todayCell) {
-
-                    todayCell.classList.add(
-                        'selected'
-                    );
-                }
-            }
-
-        } else {
-
-            alert(
-                data.data?.message ||
-                'Failed to add transaction'
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            'Error adding transaction:',
-            error
-        );
-
-        alert(
-            'Error adding transaction'
-        );
-    }
-}
-
-// ============================================================================
-// REFRESH JOURNAL DATA
-// ============================================================================
-
-async function refreshJournalData() {
-
-    if (
-        !APP_STATE.currentJournal
-    ) {
-        return;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                APP_STATE.appScriptUrl,
-                {
-                    method: 'POST',
-
-                    body: JSON.stringify({
-
-                        action:
-                            'getJournalDetails',
-
-                        journalId:
-                            APP_STATE
-                                .currentJournal
-                                .journalId,
-
-                        username:
-                            APP_STATE.currentUser
-                    })
-                }
-            );
-
-        const data =
-            await response.json();
-
-        if (
-            data.status === 'success'
-        ) {
-
-            APP_STATE.currentJournal =
-                data.data.journal;
-
-            APP_STATE.allTransactions =
-                data.data.transactions || [];
-
-            updateJournalHeader();
-
-            renderCalendar();
-
-            updateRecentTransactions();
-
-            // Restore selected date
-            if (
-                APP_STATE.selectedDate
-            ) {
-
-                const selectedCell =
-                    document.querySelector(
-                        `.calendar-day[onclick*="${APP_STATE.selectedDate}"]`
-                    );
-
-                if (selectedCell) {
-
-                    selectedCell.classList.add(
-                        'selected'
-                    );
-                }
-            }
-        }
-
-    } catch (error) {
-
-        console.error(
-            'Error refreshing data:',
-            error
-        );
-    }
-}
-
-// ============================================================================
-// RECENT TRANSACTIONS
-// ============================================================================
-
-function updateRecentTransactions() {
-
-    const container =
-        document.getElementById(
-            'recentTransactionList'
-        );
-
-    if (!container) {
-        return;
-    }
-
-    const transactions =
-        [
-            ...(APP_STATE.allTransactions || [])
-        ]
-            .sort(
-                (a, b) =>
-                    new Date(
-                        b.timestamp
-                    ) -
-                    new Date(
-                        a.timestamp
-                    )
             )
-            .slice(0, 20);
-
-    if (
-        transactions.length === 0
-    ) {
-
-        container.innerHTML = `
-            <p
-                style="
-                    color: var(--text-secondary);
-                    text-align: center;
-                    padding: 20px;
-                "
-            >
-                No transactions yet
-            </p>
-        `;
-
-        return;
-    }
-
-    container.innerHTML =
-        transactions
-            .map(txn => {
-
-                const time =
-                    new Date(
-                        txn.timestamp
-                    ).toLocaleTimeString(
-                        'en-IN',
-                        {
-                            hour:
-                                '2-digit',
-
-                            minute:
-                                '2-digit',
-
-                            timeZone:
-                                'Asia/Kolkata'
-                        }
-                    );
-
-                const date =
-                    formatDate(
-                        txn.transactionDate
-                    );
-
-                const amount =
-                    parseFloat(
-                        txn.amount
-                    ) || 0;
-
-                return `
-                    <div class="transaction-item">
-
-                        <div class="transaction-left">
-
-                            <div class="transaction-type">
-                                ${
-                                    txn.type === 'PROFIT'
-                                        ? '📈 Profit'
-                                        : '📉 Loss'
-                                }
-                            </div>
-
-                            <div class="transaction-time">
-                                ${date} at ${time}
-                            </div>
-
-                        </div>
-
-                        <div class="transaction-right">
-
-                            <div
-                                class="transaction-amount ${
-                                    txn.type === 'PROFIT'
-                                        ? 'profit'
-                                        : 'loss'
-                                }"
-                            >
-                                ${
-                                    txn.type === 'PROFIT'
-                                        ? '+'
-                                        : '-'
-                                }₹${amount.toLocaleString(
-                                    'en-IN',
-                                    {
-                                        minimumFractionDigits: 2
-                                    }
-                                )}
-                            </div>
-
-                        </div>
-
-                    </div>
-                `;
-            })
             .join('');
+
 }
 
+
 // ============================================================================
-// UTILITIES
+// DATE FORMAT
 // ============================================================================
 
-function formatDate(dateStr) {
+function formatDate(
+    dateStr
+) {
 
     if (!dateStr) {
+
         return '-';
+
     }
+
 
     const cleanDate =
         String(
             dateStr
-        ).slice(0, 10);
+        ).slice(
+            0,
+            10
+        );
 
-    const options = {
-        year:
-            'numeric',
-
-        month:
-            'short',
-
-        day:
-            'numeric',
-
-        timeZone:
-            'Asia/Kolkata'
-    };
 
     return new Date(
         cleanDate +
         'T00:00:00'
     ).toLocaleDateString(
         'en-IN',
-        options
+        {
+            year:
+                'numeric',
+
+            month:
+                'short',
+
+            day:
+                'numeric',
+
+            timeZone:
+                KOLKATA_TIMEZONE
+        }
     );
+
+}
+
+
+// ============================================================================
+// HTML SAFETY
+// ============================================================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ''
+    )
+
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+
+        .replace(
+            /</g,
+            '&lt;'
+        )
+
+        .replace(
+            />/g,
+            '&gt;'
+        )
+
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+
+}
+
+
+function escapeHtmlAttribute(
+    value
+) {
+
+    return String(
+        value ?? ''
+    )
+
+        .replace(
+            /\\/g,
+            '\\\\'
+        )
+
+        .replace(
+            /'/g,
+            "\\'"
+        );
+
 }
